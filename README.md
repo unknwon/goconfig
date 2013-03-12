@@ -20,7 +20,7 @@ It's based on [goconf](http://code.google.com/p/goconf/)
 	; Not Enough Comments!!
 	name=try one more value ^-^
 ###Code Fragment
-'''go
+```go
 	// Open and read configuration file
 	c, err := GoConfig.LoadConfigFile("Config.ini")
 	// GetValue
@@ -33,4 +33,4 @@ It's based on [goconf](http://code.google.com/p/goconf/)
 	c.SetKeyComments("Demo","key1", "More comments")
 	// Finally, you need save it
 	SaveConfigFile(c, "Config.ini")
-'''
+```
