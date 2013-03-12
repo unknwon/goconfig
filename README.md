@@ -7,7 +7,7 @@ It's based on [goconf](http://code.google.com/p/goconf/).
 ##Features:
 - It simplified operation processes, easy to use and undersatnd; therefore, there are less chances to have errors. 
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
-- It supports configuration file with comments each section or key which all the other parseres don't support!!!!!!!
+- It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
 - It Compiles!! It works with go version 1 and later.
 
 ##Example(Comments Support!!!!)

@@ -51,5 +51,6 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 
 	// Write to file
 	buf.WriteTo(f)
+	f.Close()
 	return nil
 }
