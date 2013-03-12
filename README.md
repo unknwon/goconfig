@@ -21,16 +21,22 @@ It's based on [goconf](http://code.google.com/p/goconf/)
 	name=try one more value ^-^
 ###Code Fragment
 ```go
-	// Open and read configuration file
+// Open and read configuration file
 	c, err := GoConfig.LoadConfigFile("Config.ini")
 	// GetValue
 	value, _ := c.GetValue("Demo", "key1")	// return "Let's us GoConfig!!!"
 	// GetComments
 	comments := c.GetKeyComments("Demo","key1")	// return "# This symbol can also make this line to be comments"
+	
 	// SetValue
 	c.SetValue("What's this?", "name", "Do it!")	// Now name's value is "Do it!"
 	// You can even edit comments in your code
 	c.SetKeyComments("Demo","key1", "More comments")
+	
+	// Do need that key or comments any more? Pass empty string "" to remove! that's all!'
+	c.SetValue("What's this?", "name", "") // If your key was removed, its comments will be removed too!
+	c.SetKeyComments("Demo","key1", "")
+	
 	// Finally, you need save it
 	SaveConfigFile(c, "Config.ini")
 ```
