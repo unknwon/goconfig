@@ -8,6 +8,7 @@ import (
 
 func main() {
 	c, _ := LoadConfigFile("test.ini")
+	c.SetKeyComments("Demo", "key1", "")
 	SaveConfigFile(c, "test1.ini")
 }
 

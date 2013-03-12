@@ -60,7 +60,6 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			}
 		}
 
-		fmt.Println(line)
 		// switch written for readability (not performance)
 		switch {
 		case len(line) == 0: // Empty line
