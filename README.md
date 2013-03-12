@@ -16,6 +16,7 @@ It's based on [goconf](http://code.google.com/p/goconf/).
 	[Demo]
 	# This symbol can also make this line to be comments
 	key1=Let's us GoConfig!!!
+	
 	[What's this?]
 	; Not Enough Comments!!
 	name=try one more value ^-^
