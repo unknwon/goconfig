@@ -64,8 +64,21 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		switch {
 		case len(line) == 0: // Empty line
 			continue
-		case line[0] == '#' || line[0] == ';': // Comment
-			comments += line // Append comments
+		case line[0] == '#', line[0] == ';': // Comment
+			// Append comments
+			if len(comments) == 0 {
+				comments = line
+			} else {
+				comments += LineBreak + line
+			}
+			continue
+		case len(line) >= 3 && strings.ToLower(line[0:3]) == "rem": // Comment
+			// Append comments
+			if len(comments) == 0 {
+				comments = line
+			} else {
+				comments += LineBreak + line
+			}
 			continue
 		case line[0] == '[' && line[len(line)-1] == ']': // New sction
 			// Get section name
@@ -79,7 +92,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		case section == "": // No section defined so far
 			return ReadError{BlankSection, line}
 		default: // Other alternatives
-			i := strings.IndexAny(line, "=")
+			i := strings.IndexAny(line, "=:")
 			if i > 0 {
 				key := strings.TrimSpace(line[0:i])
 				value := strings.TrimSpace(line[i+1:])
