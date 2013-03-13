@@ -58,13 +58,13 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	// Finally, you need save it
 	SaveConfigFile(c, "Config_test.ini")
 ```
-###Installation
+##Installation
 	go get github.com/Unknwon/GoConfig
-###More Information
+##More Information
 - All characters are CASE SENSITIVE, BE CAREFULL!
 - If you use other operation systems instead of windows, you may want to change global variable [ LineBreak ] in conf.go, replace it with suitable characters, default value "\r\n" is for windows only. You can also use "\n" in all operation systems because I use "\n" as line break, it may look strange when you open with Notepad.exe in windows, but it works anyway. 
 
-###References
+##References
 - [goconf](http://code.google.com/p/goconf/)
 - [robfig/config](https://github.com/robfig/config)
 - [Delete an item from a slice](https://groups.google.com/forum/?fromgroups=#!topic/golang-nuts/lYz8ftASMQ0)
