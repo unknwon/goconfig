@@ -19,7 +19,7 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 	// Data buffer
 	buf := bytes.NewBuffer(nil)
 	// Write sections
-	for section, sectionmap := range c.data {
+	for _, section := range c.sectionList {
 		// Write section comments
 		if len(c.GetSectionComments(section)) > 0 {
 			if _, err = buf.WriteString(c.GetSectionComments(section) + LineBreak); err != nil {
@@ -30,8 +30,9 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 		if _, err = buf.WriteString("[" + section + "]" + LineBreak); err != nil {
 			return err
 		}
+
 		// Write keys
-		for key, value := range sectionmap {
+		for _, key := range c.keyList[section] {
 			// Write key comments
 			if len(c.GetKeyComments(section, key)) > 0 {
 				if _, err = buf.WriteString(c.GetKeyComments(section, key) + LineBreak); err != nil {
@@ -39,10 +40,11 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 				}
 			}
 			// Write key and value
-			if _, err = buf.WriteString(key + "=" + value + LineBreak); err != nil {
+			if _, err = buf.WriteString(key + "=" + c.data[section][key] + LineBreak); err != nil {
 				return err
 			}
 		}
+
 		// Put a line between sections
 		if _, err = buf.WriteString(LineBreak); err != nil {
 			return err

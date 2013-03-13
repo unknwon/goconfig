@@ -41,7 +41,8 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 	// Create buffer reader
 	buf := bufio.NewReader(reader)
 
-	var section, comments string
+	section := DEFAULT_SECTION
+	var comments string
 	// Parse line-by-line
 	for {
 		line, err := buf.ReadString('\n')
