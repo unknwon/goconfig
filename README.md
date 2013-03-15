@@ -1,7 +1,7 @@
-GoConfig
+goconfig
 ========
 ##About
-GoConfig is a easy-use comments-support configuration file parser for the Go Programming Language which provides a structure similar to what you would find on Microsoft Windows INI files.
+goconfig is a easy-use comments-support configuration file parser for the Go Programming Language which provides a structure similar to what you would find on Microsoft Windows INI files.
 
 The configuration file consists of sections, led by a "*[section]*" header and followed by "*name:value*" entries; "*name=value*" is also accepted. Note that leading whitespace is removed from values. The optional values can contain format strings which refer to other values in the same section, or values in a special DEFAULT section. Comments are indicated by ";" or "#"; comments may begin anywhere on a single line.
 
