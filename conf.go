@@ -1,6 +1,8 @@
 // Copyright 2013 The Author - Unknown. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
+// goconfig is a easy-use comments-support configuration file parser.
 package goconfig
 
 import (
