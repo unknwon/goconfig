@@ -1,18 +1,22 @@
 goconfig
 ========
-##About
+## About
+
 goconfig is a easy-use comments-support configuration file parser for the Go Programming Language which provides a structure similar to what you would find on Microsoft Windows INI files.
 
 The configuration file consists of sections, led by a "*[section]*" header and followed by "*name:value*" entries; "*name=value*" is also accepted. Note that leading whitespace is removed from values. The optional values can contain format strings which refer to other values in the same section, or values in a special DEFAULT section. Comments are indicated by ";" or "#"; comments may begin anywhere on a single line.
 
-##Features
+## Features
+
 - It simplified operation processes, easy to use and undersatnd; therefore, there are less chances to have errors. 
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
 - It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
 - It Compiles!! It works with go version 1 and later.
 
-##Example(Comments Support!!!!)
-###Config.ini
+## Example(Comments Support!!!!)
+
+### Config.ini
+	
 	; Google
 	google=www.google.com
 	search: http://%(google)s
@@ -28,7 +32,9 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	[What's this?]
 	; Not Enough Comments!!
 	name=try one more value ^-^
-###Code Fragment
+
+### Code Fragment
+
 ```go
 	// Open and read configuration file
 	c, err := GoConfig.LoadConfigFile("Config.ini")
@@ -58,13 +64,18 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	// Finally, you need save it
 	SaveConfigFile(c, "Config_test.ini")
 ```
-##Installation
+
+## Installation
+	
 	go get github.com/Unknwon/goconfig
-##More Information
+
+## More Information
+
 - All characters are CASE SENSITIVE, BE CAREFULL!
 - If you use other operation systems instead of windows, you may want to change global variable [ LineBreak ] in conf.go, replace it with suitable characters, default value "\r\n" is for windows only. You can also use "\n" in all operation systems because I use "\n" as line break, it may look strange when you open with Notepad.exe in windows, but it works anyway. 
 
-##References
+## References
+
 - [goconf](http://code.google.com/p/goconf/)
 - [robfig/config](https://github.com/robfig/config)
 - [Delete an item from a slice](https://groups.google.com/forum/?fromgroups=#!topic/golang-nuts/lYz8ftASMQ0)
