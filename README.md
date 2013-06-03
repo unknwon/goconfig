@@ -75,8 +75,14 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	c.SetValue("What's this?", "name_test", "added by test")
 
 	// Support for recursion sections.
-	age, _ := c.GetValue("parent", "age")
-	fmt.Println("parent age:", age) // 3, not 32.
+	age, _ := c.GetValue("parent.child", "age")
+	if age != "3" {
+		t.Errorf("Recursion section: should have %d but get %s.", 3, age) // 3, not 32.
+	}
+	name, _ := c.GetValue("parent.child", "name")
+	if name != "john" {
+		t.Errorf("Recursion section: should have %d but get %s.", "john", name) // "john, not empty.
+	}
 	
 	// Finally, you need save it.
 	SaveConfigFile(c, "config_test.ini")
