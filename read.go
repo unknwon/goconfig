@@ -85,15 +85,11 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			continue
 		case line[0] == '[' && line[len(line)-1] == ']': // New sction.
 			// Get section name.
-			newSec := strings.TrimSpace(line[1 : len(line)-1])
-			// Check if it is a sub-section of current's.
-			if !strings.HasPrefix(newSec, section+".") {
-				section = newSec
-				// Set section comments and empty if it has comments.
-				if len(comments) > 0 {
-					c.SetSectionComments(section, comments)
-					comments = ""
-				}
+			section = strings.TrimSpace(line[1 : len(line)-1])
+			// Set section comments and empty if it has comments.
+			if len(comments) > 0 {
+				c.SetSectionComments(section, comments)
+				comments = ""
 			}
 			continue
 		case section == "": // No section defined so far

@@ -119,13 +119,24 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 func (c *ConfigFile) GetValue(section, key string) (value string, err error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
-		// Not exists
+		// Section does not exist.
 		return "", GetError{SectionNotFound, section}
 	}
 
-	// Exists
-	value = c.data[section][key]
+	// Section exists.
+	// Check if key exists.
+	value, ok := c.data[section][key]
+	if !ok {
+		// Check if it is a sub-section.
+		if i := strings.LastIndex(section, "."); i > -1 {
+			return c.GetValue(section[:i], key)
+		}
 
+		// Return empty value.
+		return "", nil
+	}
+
+	// Key exists.
 	var i int
 	for i = 0; i < _DEPTH_VALUES; i++ {
 		vr := varRegExp.FindString(value)

@@ -13,7 +13,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 - It simplified operation processes, easy to use and undersatnd; therefore, there are less chances to have errors. 
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
-- It supports read recursion sections, but not able to write yet.
+- It supports read recursion sections.
 - It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
 - It Compiles!! It works with go version 1 and later.
 
@@ -94,7 +94,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 ## Known issues
 
-- Not able to write recursion sections, read only, be careful when you save configuration file with goconfig if you are using recursion sections.
+- Not able to save content with same order when it's loaded because I use map.
 
 ## References
 
