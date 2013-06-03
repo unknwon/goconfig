@@ -42,7 +42,7 @@ type ConfigFile struct {
 	keyComments     map[string]map[string]string // Keys comments
 }
 
-// NewConfigFile creates an empty configuration representation.
+// newConfigFile creates an empty configuration representation.
 // This representation can be filled with AddSection and AddKey and then
 // saved to a file using SaveConfigFile.
 func newConfigFile() *ConfigFile {

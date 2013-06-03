@@ -15,33 +15,34 @@ import (
 // LoadConfigFile reads a file and returns a new configuration representation.
 // This representation can be queried with GetValue.
 func LoadConfigFile(filename string) (c *ConfigFile, err error) {
-	// Read configuration file by filename
+	// Read configuration file by filename.
 	var f *os.File
 	if f, err = os.Open(filename); err != nil {
 		return nil, err
 	}
 
-	// Create a new configFile
+	// Create a new configFile.
 	c = newConfigFile()
 	if err = c.read(f); err != nil {
 		return nil, err
 	}
 
-	// Close local configuration file
+	// Close local configuration file.
 	if err = f.Close(); err != nil {
 		return nil, err
 	}
 
-	// Return ConfigFile
+	// Return ConfigFile.
 	return c, nil
 }
 
 // Read reads an io.Reader and returns a configuration representation. This
 // representation can be queried with GetValue.
 func (c *ConfigFile) read(reader io.Reader) (err error) {
-	// Create buffer reader
+	// Create buffer reader.
 	buf := bufio.NewReader(reader)
 
+	// Current section name.
 	section := DEFAULT_SECTION
 	var comments string
 	// Parse line-by-line
@@ -66,7 +67,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		switch {
 		case len(line) == 0: // Empty line
 			continue
-		case line[0] == '#', line[0] == ';': // Comment
+		case line[0] == '#' || line[0] == ';': // Comment
 			// Append comments
 			if len(comments) == 0 {
 				comments = line
@@ -82,13 +83,17 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				comments += LineBreak + line
 			}
 			continue
-		case line[0] == '[' && line[len(line)-1] == ']': // New sction
-			// Get section name
-			section = strings.TrimSpace(line[1 : len(line)-1])
-			// Set section comments and empty if it has comments
-			if len(comments) > 0 {
-				c.SetSectionComments(section, comments)
-				comments = ""
+		case line[0] == '[' && line[len(line)-1] == ']': // New sction.
+			// Get section name.
+			newSec := strings.TrimSpace(line[1 : len(line)-1])
+			// Check if it is a sub-section of current's.
+			if !strings.HasPrefix(newSec, section+".") {
+				section = newSec
+				// Set section comments and empty if it has comments.
+				if len(comments) > 0 {
+					c.SetSectionComments(section, comments)
+					comments = ""
+				}
 			}
 			continue
 		case section == "": // No section defined so far

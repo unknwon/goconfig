@@ -1,5 +1,8 @@
 goconfig
 ========
+
+[![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.png)](https://drone.io/github.com/Unknwon/goconfig/latest)
+
 ## About
 
 goconfig is a easy-use comments-support configuration file parser for the Go Programming Language which provides a structure similar to what you would find on Microsoft Windows INI files.
@@ -10,12 +13,13 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 - It simplified operation processes, easy to use and undersatnd; therefore, there are less chances to have errors. 
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
+- It supports read recursion sections, but not able to write yet.
 - It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
 - It Compiles!! It works with go version 1 and later.
 
 ## Example(Comments Support!!!!)
 
-### Config.ini
+### config.ini
 	
 	; Google
 	google=www.google.com
@@ -33,11 +37,20 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	; Not Enough Comments!!
 	name=try one more value ^-^
 
+	[parent]
+	name=john
+	relation=father
+	sex=male
+	age=32
+
+	[parent.child]
+	age=3
+
 ### Code Fragment
 
 ```go
-	// Open and read configuration file
-	c, err := GoConfig.LoadConfigFile("Config.ini")
+	// Open and read configuration file.
+	c, err := GoConfig.LoadConfigFile("config.ini")
 	
 	// GetValue
 	value, _ := c.GetValue("Demo", "key1") // return "Let's use GoConfig!!!"
@@ -61,8 +74,12 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	c.SetValue("What's this?", "name", "") // If your key was removed, its comments will be removed too!
 	c.SetValue("What's this?", "name_test", "added by test")
 
-	// Finally, you need save it
-	SaveConfigFile(c, "Config_test.ini")
+	// Support for recursion sections.
+	age, _ := c.GetValue("parent", "age")
+	fmt.Println("parent age:", age) // 3, not 32.
+	
+	// Finally, you need save it.
+	SaveConfigFile(c, "config_test.ini")
 ```
 
 ## Installation
@@ -73,6 +90,11 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 - All characters are CASE SENSITIVE, BE CAREFULL!
 - If you use other operation systems instead of windows, you may want to change global variable [ LineBreak ] in conf.go, replace it with suitable characters, default value "\r\n" is for windows only. You can also use "\n" in all operation systems because I use "\n" as line break, it may look strange when you open with Notepad.exe in windows, but it works anyway. 
+－ API documentation: [Go Walker](http://gowalker.org/github.com/Unknwon/goconfig).
+
+## Known issues
+
+- Not able to write recursion sections, read only, be careful when you save configuration file with goconfig if you are using recursion sections.
 
 ## References
 

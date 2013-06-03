@@ -1,15 +1,17 @@
 // Copyright 2013 The Author - Unknown. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
 package goconfig
 
 import (
 	"errors"
+	"fmt"
 	"testing"
 )
 
 func TestBuild(t *testing.T) {
-	c, err := LoadConfigFile("Config.ini")
+	c, err := LoadConfigFile("config.ini")
 	if err != nil {
 		t.Error(err)
 	}
@@ -42,6 +44,10 @@ func TestBuild(t *testing.T) {
 	c.SetValue("What's this?", "name", "") // If your key was removed, its comments will be removed too!
 	c.SetValue("What's this?", "name_test", "added by test")
 
+	// Support for recursion sections.
+	age, _ := c.GetValue("parent", "age")
+	fmt.Println("parent age:", age) // 3, not 32.
+
 	// Finally, you need save it
-	SaveConfigFile(c, "Config_test.ini")
+	SaveConfigFile(c, "config_test.ini")
 }
