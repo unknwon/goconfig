@@ -50,7 +50,11 @@ func TestBuild(t *testing.T) {
 	}
 	name, _ := c.GetValue("parent.child", "name")
 	if name != "john" {
-		t.Errorf("Recursion section: should have %d but get %s.", "john", name) // "john, not empty.
+		t.Errorf("Recursion section: should have %s but get %s.", "john", name) // "john, not empty.
+	}
+	name, _ = c.GetValue("parent.child.child", "name")
+	if name != "john" {
+		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john, not empty.
 	}
 
 	// Finally, you need save it
