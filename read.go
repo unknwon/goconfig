@@ -91,6 +91,8 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				c.SetSectionComments(section, comments)
 				comments = ""
 			}
+			// Make section exist even though it does not have any key.
+			c.SetValue(section, " ", " ")
 			continue
 		case section == "": // No section defined so far
 			return ReadError{BlankSection, line}
