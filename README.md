@@ -46,6 +46,8 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	[parent.child]
 	age=3
 
+	[parent.child.child]
+	
 ### Code Fragment
 
 ```go
@@ -82,6 +84,10 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	name, _ := c.GetValue("parent.child", "name")
 	if name != "john" {
 		t.Errorf("Recursion section: should have %d but get %s.", "john", name) // "john, not empty.
+	}
+	name, _ = c.GetValue("parent.child.child", "name")
+	if name != "john" {
+		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john, not empty.
 	}
 	
 	// Finally, you need save it.
