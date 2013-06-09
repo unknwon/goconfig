@@ -161,6 +161,19 @@ func (c *ConfigFile) GetValue(section, key string) (value string, err error) {
 	return value, nil
 }
 
+// GetSection returns key-value pairs in given section.
+// It section does not exist, returns nil and error.
+func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
+	// Check if section exists
+	if _, ok := c.data[section]; !ok {
+		// Section does not exist.
+		return nil, GetError{SectionNotFound, section}
+	}
+
+	// Section exists.
+	return c.data[section], nil
+}
+
 // SetSectionComments adds new section comments to the configuration.
 // If comments are empty(0 length), it will remove its section comments!
 // It returns true if the comments were inserted or removed, and false if the comments were overwritten.
