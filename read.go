@@ -100,7 +100,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		case section == "": // No section defined so far
 			return ReadError{BlankSection, line}
 		default: // Other alternatives
-			i := strings.IndexAny(line, "=: ")
+			i := strings.IndexAny(line, "=:")
 			if i > 0 {
 				key := strings.TrimSpace(line[0:i])
 				// Check if it needs auto increment.

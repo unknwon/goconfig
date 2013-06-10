@@ -33,8 +33,6 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	key1=Let's us GoConfig!!!
 	key2=test data
 	key3=this is based on key2:%(key2)s
-	# Use space to seperate key and value? Go ahead!
-	key4 value of key4
 
 	[What's this?]
 	; Not Enough Comments!!
@@ -53,7 +51,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 	; Auto increment by setting key to "-"
 	[auto increment]
-	- hello
+	-:hello
 	-:go
 	-=config
 	
