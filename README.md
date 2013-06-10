@@ -57,7 +57,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	-:go
 	-=config
 	
-### Code Fragment ([goconfig_test.go](goconfig_test.go))
+### Code Fragment ([GoConfig_test.go](GoConfig_test.go))
 
 ```go
 	c, err := LoadConfigFile("config.ini")
