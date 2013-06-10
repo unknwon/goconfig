@@ -170,8 +170,12 @@ func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
 		return nil, GetError{SectionNotFound, section}
 	}
 
+	// Remove pre-defined key.
+	secMap := c.data[section]
+	delete(c.data[section], " ")
+
 	// Section exists.
-	return c.data[section], nil
+	return secMap, nil
 }
 
 // SetSectionComments adds new section comments to the configuration.

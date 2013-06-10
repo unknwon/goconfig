@@ -42,6 +42,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 	// Create buffer reader.
 	buf := bufio.NewReader(reader)
 
+	count := 1 // Counter for auto increment.
 	// Current section name.
 	section := DEFAULT_SECTION
 	var comments string
@@ -93,13 +94,20 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			}
 			// Make section exist even though it does not have any key.
 			c.SetValue(section, " ", " ")
+			// Reset counter.
+			count = 1
 			continue
 		case section == "": // No section defined so far
 			return ReadError{BlankSection, line}
 		default: // Other alternatives
-			i := strings.IndexAny(line, "=:")
+			i := strings.IndexAny(line, "=: ")
 			if i > 0 {
 				key := strings.TrimSpace(line[0:i])
+				// Check if it needs auto increment.
+				if key == "-" {
+					key = "#" + fmt.Sprint(count)
+					count++
+				}
 				value := strings.TrimSpace(line[i+1:])
 				// Add section, key and value
 				c.SetValue(section, key, value)

@@ -5,7 +5,6 @@
 package goconfig
 
 import (
-	"errors"
 	"testing"
 )
 
@@ -18,13 +17,17 @@ func TestBuild(t *testing.T) {
 	// GetValue
 	value, _ := c.GetValue("Demo", "key1") // return "Let's use GoConfig!!!"
 	if value != "Let's us GoConfig!!!" {
-		t.Error(errors.New("Error occurs when GetValue"))
+		t.Error("Error occurs when GetValue of key1")
 	}
 
 	// GetComments
 	comments := c.GetKeyComments("Demo", "key1") // return "# This symbol can also make this line to be comments"
 	if comments != "# This symbol can also make this line to be comments" {
-		t.Error(errors.New("Error occurs when GetKeyComments"))
+		t.Error("Error occurs when GetKeyComments")
+	}
+	key4, _ := c.GetValue("Demo", "key4")
+	if key4 != "value of key4" {
+		t.Error("Error occurs when GetValue of key4")
 	}
 
 	// SetValue
@@ -50,13 +53,25 @@ func TestBuild(t *testing.T) {
 	}
 	name, _ := c.GetValue("parent.child", "name")
 	if name != "john" {
-		t.Errorf("Recursion section: should have %s but get %s.", "john", name) // "john, not empty.
+		t.Errorf("Recursion section: should have %s but get %s.", "john", name) // "john", not empty.
 	}
 	name, _ = c.GetValue("parent.child.child", "name")
 	if name != "john" {
-		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john, not empty.
+		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john", not empty.
 	}
 
-	// Finally, you need save it
+	// GetSection and auto increment.
+	se, _ := c.GetSection("auto increment")
+	if len(se) != 3 {
+		t.Errorf("GetSection: should have %d of map elements but get %d.", 3,
+			len(se)) // 3
+	}
+
+	hello, _ := c.GetValue("auto increment", "#1")
+	if hello != "hello" {
+		t.Error("Error occurs when GetValue of auto increment: " + hello) // "hello", not empty.
+	}
+
+	// Finally, you need to save it
 	SaveConfigFile(c, "config_test.ini")
 }

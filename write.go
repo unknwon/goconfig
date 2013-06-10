@@ -41,8 +41,15 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 						return err
 					}
 				}
+
+				keyName := key
+				// Check if it's auto increment.
+				if keyName[0] == '#' {
+					keyName = "-"
+				}
+
 				// Write key and value
-				if _, err = buf.WriteString(key + "=" + c.data[section][key] + LineBreak); err != nil {
+				if _, err = buf.WriteString(keyName + "=" + c.data[section][key] + LineBreak); err != nil {
 					return err
 				}
 			}

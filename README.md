@@ -14,6 +14,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 - It simplified operation processes, easy to use and undersatnd; therefore, there are less chances to have errors. 
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
 - It supports read recursion sections.
+- It supports auto increment of key.
 - It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
 - It Compiles!! It works with go version 1 and later.
 
@@ -24,7 +25,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	; Google
 	google=www.google.com
 	search: http://%(google)s
-	
+
 	; Here are Comments
 	; Second line
 	[Demo]
@@ -32,6 +33,8 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	key1=Let's us GoConfig!!!
 	key2=test data
 	key3=this is based on key2:%(key2)s
+	# Use space to seperate key and value? Go ahead!
+	key4 value of key4
 
 	[What's this?]
 	; Not Enough Comments!!
@@ -47,18 +50,36 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	age=3
 
 	[parent.child.child]
+
+	; Auto increment by setting key to "-"
+	[auto increment]
+	- hello
+	-:go
+	-=config
 	
-### Code Fragment
+### Code Fragment ([goconfig_test.go](goconfig_test.go))
 
 ```go
-	// Open and read configuration file.
-	c, err := GoConfig.LoadConfigFile("config.ini")
-	
+	c, err := LoadConfigFile("config.ini")
+	if err != nil {
+		t.Error(err)
+	}
+
 	// GetValue
 	value, _ := c.GetValue("Demo", "key1") // return "Let's use GoConfig!!!"
+	if value != "Let's us GoConfig!!!" {
+		t.Error("Error occurs when GetValue of key1")
+	}
 
 	// GetComments
 	comments := c.GetKeyComments("Demo", "key1") // return "# This symbol can also make this line to be comments"
+	if comments != "# This symbol can also make this line to be comments" {
+		t.Error("Error occurs when GetKeyComments")
+	}
+	key4, _ := c.GetValue("Demo", "key4")
+	if key4 != "value of key4" {
+		t.Error("Error occurs when GetValue of key4")
+	}
 
 	// SetValue
 	c.SetValue("What's this?", "name", "Do it!") // Now name's value is "Do it!"
@@ -66,7 +87,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	c.SetValue(DEFAULT_SECTION, "path", search)
 	key3, _ := c.GetValue("Demo", "key3")
 	c.SetValue("Demo", "key3", key3)
-	
+
 	// You can even edit comments in your code
 	c.SetKeyComments("Demo", "key1", "")
 	c.SetKeyComments("Demo", "key2", "comments by code without symbol")
@@ -83,14 +104,26 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	}
 	name, _ := c.GetValue("parent.child", "name")
 	if name != "john" {
-		t.Errorf("Recursion section: should have %d but get %s.", "john", name) // "john, not empty.
+		t.Errorf("Recursion section: should have %s but get %s.", "john", name) // "john", not empty.
 	}
 	name, _ = c.GetValue("parent.child.child", "name")
 	if name != "john" {
-		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john, not empty.
+		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john", not empty.
 	}
-	
-	// Finally, you need save it.
+
+	// GetSection and auto increment.
+	se, _ := c.GetSection("auto increment")
+	if len(se) != 3 {
+		t.Errorf("GetSection: should have %d of map elements but get %d.", 3,
+			len(se)) // 3
+	}
+
+	hello, _ := c.GetValue("auto increment", "#1")
+	if hello != "hello" {
+		t.Error("Error occurs when GetValue of auto increment: " + hello) // "hello", not empty.
+	}
+
+	// Finally, you need to save it
 	SaveConfigFile(c, "config_test.ini")
 ```
 
