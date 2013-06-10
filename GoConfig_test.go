@@ -57,6 +57,16 @@ func TestBuild(t *testing.T) {
 		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john, not empty.
 	}
 
+	// GetSection and auto increment
+	se, _ := c.GetSection("auto increment")
+	if len(se) != 3 {
+		t.Errorf("GetSection auto increment: should have %d number of map elements but get %n.", 3, len(se)) // 3
+	}
+
+	hello, _ := c.GetValue("auto increment", "1")
+	if hello != "hello" {
+		t.Error(errors.New("Error occurs when GetValue of auto increment" + hello)) // "hello, not empty.
+	}
 	// Finally, you need save it
 	SaveConfigFile(c, "config_test.ini")
 }

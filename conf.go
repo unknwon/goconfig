@@ -30,6 +30,8 @@ var (
 	LineBreak = "\r\n"
 	// %(variable)s
 	varRegExp = regexp.MustCompile(`%\(([a-zA-Z0-9_.\-]+)\)s`)
+	// counter for auto increment key name
+	counter = 0
 )
 
 // ConfigFile is the representation of configuration settings.
@@ -59,6 +61,14 @@ func newConfigFile() *ConfigFile {
 // It returns true if the key and value were inserted or removed, and false if the value was overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
+	// Check key eq "-". auto increment
+	if key == "-" {
+		counter++
+		key = " " + fmt.Sprint(counter)
+	} else if len(key) > 0 && key[0] >= '0' && key[0] <= '9' {
+		// Check auto increment
+		key = " " + key
+	}
 	// Check if section exists
 	if _, ok := c.data[section]; ok {
 		// Section exists
@@ -87,19 +97,14 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 			return true
 		}
 	} else {
-		// Section not exists
-		// Check length of value
-		if len(value) == 0 {
-			// Not exists can be seen as remove
-			return true
-		} else {
-			// Execute add operation
-			c.data[section] = make(map[string]string)
-			// Append section to list
-			c.sectionList = append(c.sectionList, section)
-		}
+		// Execute add operation
+		c.data[section] = make(map[string]string)
+		// Append section to list
+		c.sectionList = append(c.sectionList, section)
 	}
-
+	if len(key) == 0 {
+		return true
+	}
 	// Check if key exists
 	_, ok := c.data[section][key]
 	c.data[section][key] = value
@@ -117,6 +122,11 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // It returns an error if the section does not exist and empty string value
 // It returns an empty string if the (default)key does not exist and nil error.
 func (c *ConfigFile) GetValue(section, key string) (value string, err error) {
+
+	if len(key) > 0 && key[0] >= '0' && key[0] <= '9' {
+		// Check auto increment
+		key = " " + key
+	}
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
@@ -204,6 +214,9 @@ func (c *ConfigFile) SetSectionComments(section, comments string) bool {
 // It returns true if the comments were inserted or removed, and false if the comments were overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetKeyComments(section, key, comments string) bool {
+	if len(key) == 0 || key == "-" || key[0] == ' ' {
+		return false
+	}
 	// Check if section exists
 	if _, ok := c.keyComments[section]; ok {
 		// Section exists

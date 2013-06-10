@@ -34,17 +34,19 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 
 		// Write keys
 		for _, key := range c.keyList[section] {
-			if key != " " {
-				// Write key comments
-				if len(c.GetKeyComments(section, key)) > 0 {
-					if _, err = buf.WriteString(c.GetKeyComments(section, key) + LineBreak); err != nil {
-						return err
-					}
-				}
-				// Write key and value
-				if _, err = buf.WriteString(key + "=" + c.data[section][key] + LineBreak); err != nil {
+			k := key
+			if k[0] == ' ' {
+				k = "-"
+			}
+			// Write key comments
+			if k != "" && len(c.GetKeyComments(section, key)) > 0 {
+				if _, err = buf.WriteString(c.GetKeyComments(section, key) + LineBreak); err != nil {
 					return err
 				}
+			}
+			// Write key and value
+			if _, err = buf.WriteString(k + "=" + c.data[section][key] + LineBreak); err != nil {
+				return err
 			}
 		}
 
