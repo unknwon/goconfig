@@ -74,10 +74,6 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	if comments != "# This symbol can also make this line to be comments" {
 		t.Error("Error occurs when GetKeyComments")
 	}
-	key4, _ := c.GetValue("Demo", "key4")
-	if key4 != "value of key4" {
-		t.Error("Error occurs when GetValue of key4")
-	}
 
 	// SetValue
 	c.SetValue("What's this?", "name", "Do it!") // Now name's value is "Do it!"
