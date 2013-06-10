@@ -15,6 +15,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
 - It supports read recursion sections.
 - It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
+- It supports auto increment of key.
 - It Compiles!! It works with go version 1 and later.
 
 ## Example(Comments Support!!!!)
@@ -47,6 +48,19 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 	age=3
 
 	[parent.child.child]
+	
+	; delimiter supports " ","=",":"
+	[delimiter]
+	one space
+	and=equal sign
+	yet:colon
+
+	; auto increment. uses "-"
+	[auto increment]
+	- hello
+	-:go
+	-=config
+
 	
 ### Code Fragment
 
@@ -90,6 +104,16 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 		t.Errorf("Recursion section2: should have %s but get %s.", "john", name) // "john, not empty.
 	}
 	
+	// GetSection and auto increment
+	se, _ := c.GetSection("auto increment")
+	if len(se) != 3 {
+		t.Errorf("GetSection auto increment: should have %d number of map elements but get %n.", 3, len(se)) // 3
+	}
+
+	hello, _ := c.GetValue("auto increment", "1")
+	if hello != "hello" {
+		t.Error(errors.New("Error occurs when GetValue of auto increment" + hello)) // "hello, not empty.
+	}	
 	// Finally, you need save it.
 	SaveConfigFile(c, "config_test.ini")
 ```

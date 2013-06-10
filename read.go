@@ -92,12 +92,12 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				comments = ""
 			}
 			// Make section exist even though it does not have any key.
-			c.SetValue(section, " ", " ")
+			c.SetValue(section, "", "")
 			continue
 		case section == "": // No section defined so far
 			return ReadError{BlankSection, line}
 		default: // Other alternatives
-			i := strings.IndexAny(line, "=:")
+			i := strings.IndexAny(line, "=: ")
 			if i > 0 {
 				key := strings.TrimSpace(line[0:i])
 				value := strings.TrimSpace(line[i+1:])
