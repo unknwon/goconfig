@@ -16,7 +16,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 - It supports read recursion sections.
 - It supports auto increment of key.
 - It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
-- It Compiles!! It works with go version 1 and later.
+- It supports get value through type bool, float64, int, int64 and string, methods that start with "Must" means ignore errors and get zero-value if error occurs.
 
 ## Example(Comments Support!!!!)
 
@@ -133,7 +133,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 ## Known issues
 
-- Not able to save content with same order when it's loaded because I use map.
+- Map is not thread-safe.
 
 ## References
 

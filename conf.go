@@ -8,6 +8,7 @@ package goconfig
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 )
 
@@ -116,7 +117,7 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // _DEPTH_VALUES number of iterations.
 // It returns an error if the section does not exist and empty string value
 // It returns an empty string if the (default)key does not exist and nil error.
-func (c *ConfigFile) GetValue(section, key string) (value string, err error) {
+func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
@@ -159,6 +160,89 @@ func (c *ConfigFile) GetValue(section, key string) (value string, err error) {
 		value = strings.Replace(value, vr, nvalue, -1)
 	}
 	return value, nil
+}
+
+// GetBool returns bool type value.
+func (c *ConfigFile) GetBool(section, key string) (bool, error) {
+	// Get string format value.
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return false, err
+	}
+
+	// Convert type.
+	return strconv.ParseBool(value)
+}
+
+// GetFloat64 returns float64 type value.
+func (c *ConfigFile) GetFloat64(section, key string) (float64, error) {
+	// Get string format value.
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0.0, err
+	}
+
+	// Convert type.
+	return strconv.ParseFloat(value, 64)
+}
+
+// GetInt returns int type value.
+func (c *ConfigFile) GetInt(section, key string) (int, error) {
+	// Get string format value.
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+
+	// Convert type.
+	return strconv.Atoi(value)
+}
+
+// GetInt64 returns int64 type value.
+func (c *ConfigFile) GetInt64(section, key string) (int64, error) {
+	// Get string format value.
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+
+	// Convert type.
+	return strconv.ParseInt(value, 10, 64)
+}
+
+// MustGetVlaue always returns value without error,
+// it returns empty string if error occurs.
+func (c *ConfigFile) MustGetVlaue(section, key string) string {
+	value, _ := c.GetValue(section, key)
+	return value
+}
+
+// MustGetBool always returns value without error,
+// it returns false if error occurs.
+func (c *ConfigFile) MustGetBool(section, key string) bool {
+	value, _ := c.GetBool(section, key)
+	return value
+}
+
+// MustGetFloat64 always returns value without error,
+// it returns 0.0 if error occurs.
+func (c *ConfigFile) MustGetFloat64(section, key string) float64 {
+	value, _ := c.GetFloat64(section, key)
+	return value
+}
+
+// MustGetInt always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustGetInt(section, key string) int {
+	value, _ := c.GetInt(section, key)
+	return value
+}
+
+// MustGetInt64 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustGetInt64(section, key string) int64 {
+	value, _ := c.GetInt64(section, key)
+	return value
 }
 
 // GetSection returns key-value pairs in given section.
