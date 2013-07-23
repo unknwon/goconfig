@@ -212,7 +212,7 @@ func (c *ConfigFile) GetInt64(section, key string) (int64, error) {
 
 // MustGetVlaue always returns value without error,
 // it returns empty string if error occurs.
-func (c *ConfigFile) MustGetVlaue(section, key string) string {
+func (c *ConfigFile) MustGetValue(section, key string) string {
 	value, _ := c.GetValue(section, key)
 	return value
 }
