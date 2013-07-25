@@ -10,6 +10,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 )
 
 const (
@@ -27,6 +28,7 @@ const (
 )
 
 var (
+	lock *sync.RWMutex
 	// Line break
 	LineBreak = "\r\n"
 	// %(variable)s
@@ -60,6 +62,9 @@ func newConfigFile() *ConfigFile {
 // It returns true if the key and value were inserted or removed, and false if the value was overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
+	lock.Lock()
+	defer lock.Unlock()
+
 	// Check if section exists
 	if _, ok := c.data[section]; ok {
 		// Section exists
@@ -118,6 +123,9 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // It returns an error if the section does not exist and empty string value
 // It returns an empty string if the (default)key does not exist and nil error.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
+	lock.RLock()
+	defer lock.RUnlock()
+
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
