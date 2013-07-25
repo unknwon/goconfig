@@ -28,7 +28,6 @@ const (
 )
 
 var (
-	lock *sync.RWMutex
 	// Line break
 	LineBreak = "\r\n"
 	// %(variable)s
@@ -38,6 +37,7 @@ var (
 // ConfigFile is the representation of configuration settings.
 // The public interface is entirely through methods.
 type ConfigFile struct {
+	lock            *sync.RWMutex
 	data            map[string]map[string]string // Section -> key : value
 	sectionList     []string                     // Section list
 	keyList         map[string][]string          // Section -> Key list
@@ -50,6 +50,7 @@ type ConfigFile struct {
 // saved to a file using SaveConfigFile.
 func newConfigFile() *ConfigFile {
 	c := new(ConfigFile)
+	c.lock = new(sync.RWMutex)
 	c.data = make(map[string]map[string]string)
 	c.keyList = make(map[string][]string)
 	c.sectionComments = make(map[string]string)
@@ -62,8 +63,8 @@ func newConfigFile() *ConfigFile {
 // It returns true if the key and value were inserted or removed, and false if the value was overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
-	lock.Lock()
-	defer lock.Unlock()
+	c.lock.Lock()
+	defer c.lock.Unlock()
 
 	// Check if section exists
 	if _, ok := c.data[section]; ok {
@@ -123,8 +124,8 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // It returns an error if the section does not exist and empty string value
 // It returns an empty string if the (default)key does not exist and nil error.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
-	lock.RLock()
-	defer lock.RUnlock()
+	c.lock.RLock()
+	defer c.lock.RUnlock()
 
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
