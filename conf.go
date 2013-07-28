@@ -19,11 +19,12 @@ const (
 	// Maximum allowed depth when recursively substituing variable names.
 	_DEPTH_VALUES = 200
 
-	// Get Errors
+	// Get Errors.
 	SectionNotFound = iota
-	// Read Errors
+	KeyNotFound
+	// Read Errors.
 	BlankSection
-	// Get and Read Errors
+	// Get and Read Errors.
 	CouldNotParse
 )
 
@@ -66,10 +67,10 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
-	// Check if section exists
+	// Check if section exists.
 	if _, ok := c.data[section]; ok {
-		// Section exists
-		// Check length of value
+		// Section exists.
+		// Check length of value.
 		if len(value) == 0 {
 			// Check if key exists
 			if _, ok := c.data[section][key]; ok {
@@ -90,28 +91,28 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 					append(c.keyList[section][:i], c.keyList[section][i+1:]...)
 			}
 
-			// Not exists can be seen as remove
+			// Not exists can be seen as remove.
 			return true
 		}
 	} else {
-		// Section not exists
-		// Check length of value
+		// Section not exists.
+		// Check length of value.
 		if len(value) == 0 {
-			// Not exists can be seen as remove
+			// Not exists can be seen as remove.
 			return true
 		} else {
-			// Execute add operation
+			// Execute add operation.
 			c.data[section] = make(map[string]string)
-			// Append section to list
+			// Append section to list.
 			c.sectionList = append(c.sectionList, section)
 		}
 	}
 
-	// Check if key exists
+	// Check if key exists.
 	_, ok := c.data[section][key]
 	c.data[section][key] = value
 	if !ok {
-		// If not exists, append to key list
+		// If not exists, append to key list.
 		c.keyList[section] = append(c.keyList[section], key)
 	}
 	return !ok
@@ -121,8 +122,7 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // If the value needs to be unfolded (see e.g. %(google)s example in the GoConfig_test.go),
 // then String does this unfolding automatically, up to
 // _DEPTH_VALUES number of iterations.
-// It returns an error if the section does not exist and empty string value
-// It returns an empty string if the (default)key does not exist and nil error.
+// It returns an error if the section or (default)key does not exist and empty string value.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	c.lock.RLock()
 	defer c.lock.RUnlock()
@@ -130,7 +130,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return "", GetError{SectionNotFound, section}
+		return "", getError{SectionNotFound, section}
 	}
 
 	// Section exists.
@@ -143,7 +143,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		}
 
 		// Return empty value.
-		return "", nil
+		return "", getError{KeyNotFound, key}
 	}
 
 	// Key exists.
@@ -260,7 +260,7 @@ func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return nil, GetError{SectionNotFound, section}
+		return nil, getError{SectionNotFound, section}
 	}
 
 	// Remove pre-defined key.
@@ -355,17 +355,17 @@ func (c *ConfigFile) GetKeyComments(section, key string) (comments string) {
 	return ""
 }
 
-// GetError occurs when get value in configuration file with invalid parameter
-type GetError struct {
-	Reason  int // Error reason
-	Section string
+// getError occurs when get value in configuration file with invalid parameter
+type getError struct {
+	Reason int // Error reason
+	Name   string
 }
 
 // Implement Error method
-func (err GetError) Error() string {
+func (err getError) Error() string {
 	switch err.Reason {
 	case SectionNotFound:
-		return fmt.Sprintf("section '%s' not found", string(err.Section))
+		return fmt.Sprintf("section '%s' not found", string(err.Name))
 	}
 
 	return "invalid get error"

@@ -5,6 +5,7 @@
 package goconfig
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -68,6 +69,6 @@ func TestBuild(t *testing.T) {
 		t.Error("Error occurs when GetValue of auto increment: " + hello) // "hello", not empty.
 	}
 
-	// Finally, you need to save it
+	// Finally, you need to save it.
 	SaveConfigFile(c, "config_test.ini")
 }
