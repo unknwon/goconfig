@@ -131,10 +131,6 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 - If you use other operation systems instead of windows, you may want to change global variable [ LineBreak ] in conf.go, replace it with suitable characters, default value "\r\n" is for windows only. You can also use "\n" in all operation systems because I use "\n" as line break, it may look strange when you open with Notepad.exe in windows, but it works anyway. 
 - API documentation: [Go Walker](http://gowalker.org/github.com/Unknwon/goconfig).
 
-## Known issues
-
-- Map is not thread-safe.
-
 ## References
 
 - [goconf](http://code.google.com/p/goconf/)
