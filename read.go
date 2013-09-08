@@ -76,14 +76,6 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				comments += LineBreak + line
 			}
 			continue
-		case len(line) >= 3 && strings.ToLower(line[0:3]) == "rem": // Comment
-			// Append comments
-			if len(comments) == 0 {
-				comments = line
-			} else {
-				comments += LineBreak + line
-			}
-			continue
 		case line[0] == '[' && line[len(line)-1] == ']': // New sction.
 			// Get section name.
 			section = strings.TrimSpace(line[1 : len(line)-1])

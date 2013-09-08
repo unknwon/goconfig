@@ -5,7 +5,6 @@
 package goconfig
 
 import (
-	"fmt"
 	"testing"
 )
 
