@@ -1,6 +1,16 @@
-// Copyright 2013 The Author - Unknown. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// Copyright 2013 Unknown
+//
+// Licensed under the Apache License, Version 2.0 (the "License"): you may
+// not use this file except in compliance with the License. You may obtain
+// a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
 
 package goconfig
 
@@ -14,15 +24,15 @@ import (
 
 // LoadConfigFile reads a file and returns a new configuration representation.
 // This representation can be queried with GetValue.
-func LoadConfigFile(filename string) (c *ConfigFile, err error) {
-	// Read configuration file by filename.
+func LoadConfigFile(fileName string) (c *ConfigFile, err error) {
+	// Read configuration file by fileName.
 	var f *os.File
-	if f, err = os.Open(filename); err != nil {
+	if f, err = os.Open(fileName); err != nil {
 		return nil, err
 	}
 
 	// Create a new configFile.
-	c = newConfigFile()
+	c = newConfigFile(fileName)
 	if err = c.read(f); err != nil {
 		return nil, err
 	}
@@ -34,6 +44,12 @@ func LoadConfigFile(filename string) (c *ConfigFile, err error) {
 
 	// Return ConfigFile.
 	return c, nil
+}
+
+// Reload reloads configuration file in case it has changes.
+func (c *ConfigFile) Reload() (err error) {
+	c, err = LoadConfigFile(c.fileName)
+	return err
 }
 
 // Read reads an io.Reader and returns a configuration representation. This
@@ -90,7 +106,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			count = 1
 			continue
 		case section == "": // No section defined so far
-			return ReadError{BlankSection, line}
+			return readError{BlankSection, line}
 		default: // Other alternatives
 			i := strings.IndexAny(line, "=:")
 			if i > 0 {
@@ -109,7 +125,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 					comments = ""
 				}
 			} else {
-				return ReadError{CouldNotParse, line} // Wrong format
+				return readError{CouldNotParse, line} // Wrong format
 			}
 		}
 
@@ -121,14 +137,14 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 	return nil
 }
 
-// ReadError occurs when read configuration file with wrong format
-type ReadError struct {
+// readError occurs when read configuration file with wrong format.
+type readError struct {
 	Reason  int    // Error reason
 	Content string // Line content
 }
 
-// Implement Error method
-func (err ReadError) Error() string {
+// Implement Error method.
+func (err readError) Error() string {
 	switch err.Reason {
 	case BlankSection:
 		return "empty section name not allowed"

@@ -1,6 +1,16 @@
-// Copyright 2013 The Author - Unknown. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
+// Copyright 2013 Unknown
+//
+// Licensed under the Apache License, Version 2.0 (the "License"): you may
+// not use this file except in compliance with the License. You may obtain
+// a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+// WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+// License for the specific language governing permissions and limitations
+// under the License.
 
 // goconfig is a easy-use comments-support configuration file parser.
 package goconfig
@@ -8,6 +18,7 @@ package goconfig
 import (
 	"fmt"
 	"regexp"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -29,16 +40,23 @@ const (
 )
 
 var (
-	// Line break
-	LineBreak = "\r\n"
+	BlockMode = true
+	LineBreak = "\r"
 	// %(variable)s
 	varRegExp = regexp.MustCompile(`%\(([a-zA-Z0-9_.\-]+)\)s`)
 )
+
+func init() {
+	if runtime.GOOS == "windows" {
+		LineBreak = "\r\n"
+	}
+}
 
 // ConfigFile is the representation of configuration settings.
 // The public interface is entirely through methods.
 type ConfigFile struct {
 	lock            *sync.RWMutex
+	fileName        string
 	data            map[string]map[string]string // Section -> key : value
 	sectionList     []string                     // Section list
 	keyList         map[string][]string          // Section -> Key list
@@ -49,9 +67,10 @@ type ConfigFile struct {
 // newConfigFile creates an empty configuration representation.
 // This representation can be filled with AddSection and AddKey and then
 // saved to a file using SaveConfigFile.
-func newConfigFile() *ConfigFile {
+func newConfigFile(fileName string) *ConfigFile {
 	c := new(ConfigFile)
 	c.lock = new(sync.RWMutex)
+	c.fileName = fileName
 	c.data = make(map[string]map[string]string)
 	c.keyList = make(map[string][]string)
 	c.sectionComments = make(map[string]string)
@@ -64,8 +83,10 @@ func newConfigFile() *ConfigFile {
 // It returns true if the key and value were inserted or removed, and false if the value was overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
-	c.lock.Lock()
-	defer c.lock.Unlock()
+	if BlockMode {
+		c.lock.Lock()
+		defer c.lock.Unlock()
+	}
 
 	// Check if section exists.
 	if _, ok := c.data[section]; ok {
@@ -124,8 +145,10 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // _DEPTH_VALUES number of iterations.
 // It returns an error if the section or (default)key does not exist and empty string value.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
-	c.lock.RLock()
-	defer c.lock.RUnlock()
+	if BlockMode {
+		c.lock.RLock()
+		defer c.lock.RUnlock()
+	}
 
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
