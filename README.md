@@ -15,7 +15,7 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 - It uses exactly the same way to access a configuration file as you use windows APIs, so you don't need to change your code style.
 - It supports read recursion sections.
 - It supports auto increment of key.
-- It supports configuration file with comments each section or key which all the other parsers don't support!!!!!!!
+- It supports **READ** and **WRITE** configuration file with comments each section or key which all the other parsers don't support!!!!!!!
 - It supports get value through type bool, float64, int, int64 and string, methods that start with "Must" means ignore errors and get zero-value if error occurs.
 
 ## Example(Comments Support!!!!)
@@ -128,9 +128,8 @@ SaveConfigFile(c, "config_test.ini")
 ## More Information
 
 - All characters are CASE SENSITIVE, BE CAREFULL!
-- If you use other operation systems instead of windows, you may want to change global variable [ LineBreak ] in conf.go, replace it with suitable characters, default value "\r\n" is for windows only. You can also use "\n" in all operation systems because I use "\n" as line break, it may look strange when you open with Notepad.exe in windows, but it works anyway.
 
-## References
+## Credits
 
 - [goconf](http://code.google.com/p/goconf/)
 - [robfig/config](https://github.com/robfig/config)

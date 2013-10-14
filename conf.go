@@ -41,7 +41,7 @@ const (
 
 var (
 	BlockMode = true
-	LineBreak = "\r"
+	LineBreak = "\n"
 	// %(variable)s
 	varRegExp = regexp.MustCompile(`%\(([a-zA-Z0-9_.\-]+)\)s`)
 )
