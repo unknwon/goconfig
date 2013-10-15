@@ -47,8 +47,11 @@ func LoadConfigFile(fileName string) (c *ConfigFile, err error) {
 }
 
 // Reload reloads configuration file in case it has changes.
-func (c *ConfigFile) Reload() (err error) {
-	c, err = LoadConfigFile(c.fileName)
+func (c *ConfigFile) Reload() error {
+	cfg, err := LoadConfigFile(c.fileName)
+	if err == nil {
+		*c = *cfg
+	}
 	return err
 }
 
