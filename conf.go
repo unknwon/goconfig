@@ -40,7 +40,6 @@ const (
 )
 
 var (
-	BlockMode = true
 	LineBreak = "\n"
 	// %(variable)s
 	varRegExp = regexp.MustCompile(`%\(([a-zA-Z0-9_.\-]+)\)s`)
@@ -55,13 +54,14 @@ func init() {
 // ConfigFile is the representation of configuration settings.
 // The public interface is entirely through methods.
 type ConfigFile struct {
-	lock            *sync.RWMutex
+	lock            sync.RWMutex
 	fileName        string
 	data            map[string]map[string]string // Section -> key : value
 	sectionList     []string                     // Section list
 	keyList         map[string][]string          // Section -> Key list
 	sectionComments map[string]string            // Sections comments
 	keyComments     map[string]map[string]string // Keys comments
+	BlockMode       bool
 }
 
 // newConfigFile creates an empty configuration representation.
@@ -69,12 +69,12 @@ type ConfigFile struct {
 // saved to a file using SaveConfigFile.
 func newConfigFile(fileName string) *ConfigFile {
 	c := new(ConfigFile)
-	c.lock = new(sync.RWMutex)
 	c.fileName = fileName
 	c.data = make(map[string]map[string]string)
 	c.keyList = make(map[string][]string)
 	c.sectionComments = make(map[string]string)
 	c.keyComments = make(map[string]map[string]string)
+	c.BlockMode = true
 	return c
 }
 
@@ -83,7 +83,7 @@ func newConfigFile(fileName string) *ConfigFile {
 // It returns true if the key and value were inserted or removed, and false if the value was overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
-	if BlockMode {
+	if c.BlockMode {
 		c.lock.Lock()
 		defer c.lock.Unlock()
 	}
@@ -145,7 +145,7 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // _DEPTH_VALUES number of iterations.
 // It returns an error if the section or (default)key does not exist and empty string value.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
-	if BlockMode {
+	if c.BlockMode {
 		c.lock.RLock()
 		defer c.lock.RUnlock()
 	}
