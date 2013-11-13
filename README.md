@@ -1,7 +1,7 @@
-goconfig
+goconfig [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/Unknwon/goconfig/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 ========
 
-[![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.png)](https://drone.io/github.com/Unknwon/goconfig/latest) [![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/Unknwon/goconfig)
+[![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.png)](https://drone.io/github.com/Unknwon/goconfig/latest) [![Go Walker](http://gowalker.org/api/v1/badge)](http://gowalker.org/github.com/Unknwon/goconfig) 
 
 ## About
 
@@ -16,21 +16,21 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 - It supports read recursion sections.
 - It supports auto increment of key.
 - It supports **READ** and **WRITE** configuration file with comments each section or key which all the other parsers don't support!!!!!!!
-- It supports get value through type bool, float64, int, int64 and string, methods that start with "Must" means ignore errors and get zero-value if error occurs.
+- It supports get value through type bool, float64, int, int64 and string, methods that start with "Must" means ignore errors and get zero-value if error occurs, or you can specify a default value.
 
 ## Example(Comments Support!!!!)
 
-### config.ini
+### conf.ini
 	
 	; Google
 	google=www.google.com
-	search: http://%(google)s
+	search=http://%(google)s
 
 	; Here are Comments
 	; Second line
 	[Demo]
 	# This symbol can also make this line to be comments
-	key1=Let's us GoConfig!!!
+	key1=Let's us goconfig!!!
 	key2=test data
 	key3=this is based on key2:%(key2)s
 
@@ -51,28 +51,29 @@ The configuration file consists of sections, led by a "*[section]*" header and f
 
 	; Auto increment by setting key to "-"
 	[auto increment]
-	-:hello
-	-:go
+	-=hello
+	-=go
 	-=config
 	
-### Code Fragment ([GoConfig_test.go](GoConfig_test.go))
+### Code Fragment ([conf_test.go](conf_test.go))
 
 ```go
-c, err := LoadConfigFile("config.ini")
+c, err := LoadConfigFile("test/conf.ini")
 if err != nil {
 	t.Error(err)
 }
 
 // GetValue
 value, _ := c.GetValue("Demo", "key1") // return "Let's use GoConfig!!!"
-if value != "Let's us GoConfig!!!" {
-	t.Error("Error occurs when GetValue of key1")
+if value != "Let's us goconfig!!!" {
+	t.Errorf("\nExpect: %s\nGot: %s\n", "Let's us goconfig!!!", value)
 }
 
 // GetComments
 comments := c.GetKeyComments("Demo", "key1") // return "# This symbol can also make this line to be comments"
 if comments != "# This symbol can also make this line to be comments" {
-	t.Error("Error occurs when GetKeyComments")
+	t.Errorf("\nExpect: %s\nGot: %s\n",
+		"# This symbol can also make this line to be comments", value)
 }
 
 // SetValue
@@ -118,7 +119,7 @@ if hello != "hello" {
 }
 
 // Finally, you need to save it
-SaveConfigFile(c, "config_test.ini")
+SaveConfigFile(c, "test/conf_test.ini")
 ```
 
 ## Installation

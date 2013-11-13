@@ -79,8 +79,7 @@ func newConfigFile(fileName string) *ConfigFile {
 }
 
 // SetValue adds a new section-key-value to the configuration.
-// If value is an empty string(0 length), it will remove its section-key and its comments!
-// It returns true if the key and value were inserted or removed, and false if the value was overwritten.
+// It returns true if the key and value were inserted, and false if the value was overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
 	if c.BlockMode {
@@ -89,44 +88,12 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 	}
 
 	// Check if section exists.
-	if _, ok := c.data[section]; ok {
-		// Section exists.
-		// Check length of value.
-		if len(value) == 0 {
-			// Check if key exists
-			if _, ok := c.data[section][key]; ok {
-				// Execute remove operation
-				delete(c.data[section], key)
-				// Remove comments of key
-				c.SetKeyComments(section, key, "")
-				// Get index of key
-				i := 0
-				for _, keyName := range c.keyList[section] {
-					if keyName == key {
-						break
-					}
-					i++
-				}
-				// Remove from key list
-				c.keyList[section] =
-					append(c.keyList[section][:i], c.keyList[section][i+1:]...)
-			}
-
-			// Not exists can be seen as remove.
-			return true
-		}
-	} else {
+	if _, ok := c.data[section]; !ok {
 		// Section not exists.
-		// Check length of value.
-		if len(value) == 0 {
-			// Not exists can be seen as remove.
-			return true
-		} else {
-			// Execute add operation.
-			c.data[section] = make(map[string]string)
-			// Append section to list.
-			c.sectionList = append(c.sectionList, section)
-		}
+		// Execute add operation.
+		c.data[section] = make(map[string]string)
+		// Append section to list.
+		c.sectionList = append(c.sectionList, section)
 	}
 
 	// Check if key exists.
@@ -137,6 +104,37 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 		c.keyList[section] = append(c.keyList[section], key)
 	}
 	return !ok
+}
+
+// DeleteKey delete the key in given section.
+// It returns true if the key was deleted, and false if the section or key didn't exist.
+func (c *ConfigFile) DeleteKey(section, key string) bool {
+	// Check if section exists.
+	if _, ok := c.data[section]; !ok {
+		// Section not exists.
+		return false
+	}
+
+	// Check if key exists
+	if _, ok := c.data[section][key]; ok {
+		// Execute remove operation
+		delete(c.data[section], key)
+		// Remove comments of key
+		c.SetKeyComments(section, key, "")
+		// Get index of key
+		i := 0
+		for _, keyName := range c.keyList[section] {
+			if keyName == key {
+				break
+			}
+			i++
+		}
+		// Remove from key list
+		c.keyList[section] =
+			append(c.keyList[section][:i], c.keyList[section][i+1:]...)
+		return true
+	}
+	return false
 }
 
 // GetValue returns the value of key available in the given section.
@@ -244,36 +242,51 @@ func (c *ConfigFile) Int64(section, key string) (int64, error) {
 
 // MustValue always returns value without error,
 // it returns empty string if error occurs.
-func (c *ConfigFile) MustValue(section, key string) string {
-	value, _ := c.GetValue(section, key)
+func (c *ConfigFile) MustValue(section, key string, defaultVal ...string) string {
+	value, err := c.GetValue(section, key)
+	if err != nil && len(defaultVal) > 0 {
+		return defaultVal[0]
+	}
 	return value
 }
 
 // MustBool always returns value without error,
 // it returns false if error occurs.
-func (c *ConfigFile) MustBool(section, key string) bool {
-	value, _ := c.Bool(section, key)
+func (c *ConfigFile) MustBool(section, key string, defaultVal ...bool) bool {
+	value, err := c.Bool(section, key)
+	if err != nil && len(defaultVal) > 0 {
+		return defaultVal[0]
+	}
 	return value
 }
 
 // MustFloat64 always returns value without error,
 // it returns 0.0 if error occurs.
-func (c *ConfigFile) MustFloat64(section, key string) float64 {
-	value, _ := c.Float64(section, key)
+func (c *ConfigFile) MustFloat64(section, key string, defaultVal ...float64) float64 {
+	value, err := c.Float64(section, key)
+	if err != nil && len(defaultVal) > 0 {
+		return defaultVal[0]
+	}
 	return value
 }
 
 // MustInt always returns value without error,
 // it returns 0 if error occurs.
-func (c *ConfigFile) MustInt(section, key string) int {
-	value, _ := c.Int(section, key)
+func (c *ConfigFile) MustInt(section, key string, defaultVal ...int) int {
+	value, err := c.Int(section, key)
+	if err != nil && len(defaultVal) > 0 {
+		return defaultVal[0]
+	}
 	return value
 }
 
 // MustInt64 always returns value without error,
 // it returns 0 if error occurs.
-func (c *ConfigFile) MustInt64(section, key string) int64 {
-	value, _ := c.Int64(section, key)
+func (c *ConfigFile) MustInt64(section, key string, defaultVal ...int64) int64 {
+	value, err := c.Int64(section, key)
+	if err != nil && len(defaultVal) > 0 {
+		return defaultVal[0]
+	}
 	return value
 }
 

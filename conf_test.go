@@ -19,21 +19,22 @@ import (
 )
 
 func TestBuild(t *testing.T) {
-	c, err := LoadConfigFile("config.ini")
+	c, err := LoadConfigFile("test/conf.ini")
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 
 	// GetValue
 	value, _ := c.GetValue("Demo", "key1") // return "Let's use GoConfig!!!"
-	if value != "Let's us GoConfig!!!" {
-		t.Error("Error occurs when GetValue of key1")
+	if value != "Let's us goconfig!!!" {
+		t.Errorf("\nExpect: %s\nGot: %s\n", "Let's us goconfig!!!", value)
 	}
 
 	// GetComments
 	comments := c.GetKeyComments("Demo", "key1") // return "# This symbol can also make this line to be comments"
 	if comments != "# This symbol can also make this line to be comments" {
-		t.Error("Error occurs when GetKeyComments")
+		t.Errorf("\nExpect: %s\nGot: %s\n",
+			"# This symbol can also make this line to be comments", value)
 	}
 
 	// SetValue
@@ -79,5 +80,5 @@ func TestBuild(t *testing.T) {
 	}
 
 	// Finally, you need to save it.
-	SaveConfigFile(c, "config_test.ini")
+	SaveConfigFile(c, "test/conf_test.ini")
 }
