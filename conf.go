@@ -1,4 +1,4 @@
-// Copyright 2013 Unknown
+// Copyright 2013-2014 Unknown
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -55,7 +55,7 @@ func init() {
 // The public interface is entirely through methods.
 type ConfigFile struct {
 	lock            sync.RWMutex
-	fileName        string
+	fileNames       []string                     // Support mutil-files.
 	data            map[string]map[string]string // Section -> key : value
 	sectionList     []string                     // Section list
 	keyList         map[string][]string          // Section -> Key list
@@ -67,9 +67,9 @@ type ConfigFile struct {
 // newConfigFile creates an empty configuration representation.
 // This representation can be filled with AddSection and AddKey and then
 // saved to a file using SaveConfigFile.
-func newConfigFile(fileName string) *ConfigFile {
+func newConfigFile(fileNames []string) *ConfigFile {
 	c := new(ConfigFile)
-	c.fileName = fileName
+	c.fileNames = fileNames
 	c.data = make(map[string]map[string]string)
 	c.keyList = make(map[string][]string)
 	c.sectionComments = make(map[string]string)

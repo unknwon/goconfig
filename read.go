@@ -24,35 +24,53 @@ import (
 
 // LoadConfigFile reads a file and returns a new configuration representation.
 // This representation can be queried with GetValue.
-func LoadConfigFile(fileName string) (c *ConfigFile, err error) {
-	// Read configuration file by fileName.
-	var f *os.File
-	if f, err = os.Open(fileName); err != nil {
-		return nil, err
+func LoadConfigFile(fileName string, moreFiles ...string) (c *ConfigFile, err error) {
+	// Append files' name together.
+	fileNames := make([]string, 1, len(moreFiles)+1)
+	fileNames[0] = fileName
+	if len(moreFiles) > 0 {
+		fileNames = append(fileNames, moreFiles...)
 	}
 
-	// Create a new configFile.
-	c = newConfigFile(fileName)
-	if err = c.read(f); err != nil {
-		return nil, err
+	c = newConfigFile(fileNames)
+
+	for _, name := range fileNames {
+		f, err := os.Open(name)
+		if err != nil {
+			return nil, err
+		}
+
+		if err = c.read(f); err != nil {
+			return nil, err
+		}
+
+		if err = f.Close(); err != nil {
+			return nil, err
+		}
 	}
 
-	// Close local configuration file.
-	if err = f.Close(); err != nil {
-		return nil, err
-	}
-
-	// Return ConfigFile.
 	return c, nil
 }
 
 // Reload reloads configuration file in case it has changes.
-func (c *ConfigFile) Reload() error {
-	cfg, err := LoadConfigFile(c.fileName)
+func (c *ConfigFile) Reload() (err error) {
+	var cfg *ConfigFile
+	if len(c.fileNames) == 1 {
+		cfg, err = LoadConfigFile(c.fileNames[0])
+	} else {
+		cfg, err = LoadConfigFile(c.fileNames[0], c.fileNames[1:]...)
+	}
+
 	if err == nil {
 		*c = *cfg
 	}
 	return err
+}
+
+// AppendFiles appends more files to ConfigFile and reload automatically.
+func (c *ConfigFile) AppendFiles(files ...string) error {
+	c.fileNames = append(c.fileNames, files...)
+	return c.Reload()
 }
 
 // Read reads an io.Reader and returns a configuration representation. This
