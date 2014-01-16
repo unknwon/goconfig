@@ -22,6 +22,16 @@ import (
 	"strings"
 )
 
+func (c *ConfigFile) loadFile(fileName string) (err error) {
+	f, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return c.read(f)
+}
+
 // LoadConfigFile reads a file and returns a new configuration representation.
 // This representation can be queried with GetValue.
 func LoadConfigFile(fileName string, moreFiles ...string) (c *ConfigFile, err error) {
@@ -35,16 +45,7 @@ func LoadConfigFile(fileName string, moreFiles ...string) (c *ConfigFile, err er
 	c = newConfigFile(fileNames)
 
 	for _, name := range fileNames {
-		f, err := os.Open(name)
-		if err != nil {
-			return nil, err
-		}
-
-		if err = c.read(f); err != nil {
-			return nil, err
-		}
-
-		if err = f.Close(); err != nil {
+		if err = c.loadFile(name); err != nil {
 			return nil, err
 		}
 	}
