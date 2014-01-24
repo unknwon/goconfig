@@ -23,6 +23,10 @@ The configuration file consists of sections, led by a `[section]` header and fol
 	
 	go get github.com/Unknwon/goconfig
 
+Or
+
+	gopm get github.com/Unknwon/goconfig
+
 ## API Documentation
 
 [Go Walker](http://gowalker.org/github.com/Unknwon/goconfig).

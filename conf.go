@@ -148,6 +148,11 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		defer c.lock.RUnlock()
 	}
 
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.

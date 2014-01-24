@@ -37,9 +37,12 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 				return err
 			}
 		}
-		// Write section name
-		if _, err = buf.WriteString("[" + section + "]" + LineBreak); err != nil {
-			return err
+
+		if section != DEFAULT_SECTION {
+			// Write section name
+			if _, err = buf.WriteString("[" + section + "]" + LineBreak); err != nil {
+				return err
+			}
 		}
 
 		// Write keys
