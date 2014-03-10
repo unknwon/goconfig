@@ -295,6 +295,18 @@ func (c *ConfigFile) MustInt64(section, key string, defaultVal ...int64) int64 {
 	return value
 }
 
+// GetSectionList returns the list of all sections
+// in the same order in the file.
+func (c *ConfigFile) GetSectionList() []string {
+	return c.sectionList
+}
+
+// GetKeyList returns the list of all key in give section
+// in the same order in the file.
+func (c *ConfigFile) GetKeyList(section string) []string {
+	return c.keyList[section]
+}
+
 // GetSection returns key-value pairs in given section.
 // It section does not exist, returns nil and error.
 func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
