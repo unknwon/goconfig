@@ -106,7 +106,7 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 	return !ok
 }
 
-// DeleteKey delete the key in given section.
+// DeleteKey deletes the key in given section.
 // It returns true if the key was deleted, and false if the section or key didn't exist.
 func (c *ConfigFile) DeleteKey(section, key string) bool {
 	// Check if section exists.
@@ -298,13 +298,44 @@ func (c *ConfigFile) MustInt64(section, key string, defaultVal ...int64) int64 {
 // GetSectionList returns the list of all sections
 // in the same order in the file.
 func (c *ConfigFile) GetSectionList() []string {
-	return c.sectionList
+	list := make([]string, 0, len(c.sectionList))
+	copy(list, c.sectionList)
+	return list
 }
 
 // GetKeyList returns the list of all key in give section
 // in the same order in the file.
 func (c *ConfigFile) GetKeyList(section string) []string {
-	return c.keyList[section]
+	list := make([]string, 0, len(c.keyList[section]))
+	copy(list, c.keyList[section])
+	return list
+}
+
+// DeleteSection deletes the entire section by given name.
+// It returns true if the section was deleted, and false if the section didn't exist.
+func (c *ConfigFile) DeleteSection(section string) bool {
+	// Check if section exists.
+	if _, ok := c.data[section]; !ok {
+		// Section not exists.
+		return false
+	}
+
+	// Execute remove operation
+	delete(c.data, section)
+	// Remove comments of section
+	c.SetSectionComments(section, "")
+	// Get index of section
+	i := 0
+	for _, secName := range c.sectionList {
+		if secName == section {
+			break
+		}
+		i++
+	}
+	// Remove from section list
+	c.sectionList =
+		append(c.sectionList[:i], c.sectionList[i+1:]...)
+	return true
 }
 
 // GetSection returns key-value pairs in given section.

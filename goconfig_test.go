@@ -37,6 +37,23 @@ func TestLoadConfigFile(t *testing.T) {
 			So(err, ShouldNotBeNil)
 		})
 
+		Convey("Get value that section does not exist", func() {
+			_, err := c.GetValue("Demo404", "key4")
+			So(err, ShouldNotBeNil)
+		})
+
+		Convey("Get value use parent-child feature", func() {
+			v, err := c.GetValue("parent.child", "sex")
+			So(err, ShouldBeNil)
+			So(v, ShouldEqual, "male")
+		})
+
+		Convey("Get value use recursive feature", func() {
+			v, err := c.GetValue("", "search")
+			So(err, ShouldBeNil)
+			So(v, ShouldEqual, "http://www.google.com")
+		})
+
 		Convey("Set value that does exist", func() {
 			ok := c.SetValue("Demo", "key2", "hello man!")
 			So(ok, ShouldBeFalse)
@@ -54,10 +71,30 @@ func TestLoadConfigFile(t *testing.T) {
 		})
 
 		Convey("Delete a key", func() {
-			ok := c.DeleteKey("Demo", "key4")
+			ok := c.DeleteKey("Demo", "key404")
+			So(ok, ShouldBeFalse)
+			ok = c.DeleteKey("Demo", "key4")
 			So(ok, ShouldBeTrue)
 			_, err := c.GetValue("Demo", "key4")
 			So(err, ShouldNotBeNil)
+			ok = c.DeleteKey("404", "key")
+			So(ok, ShouldBeFalse)
+		})
+
+		Convey("Delete all the keys", func() {
+			for _, key := range c.GetKeyList("Demo") {
+				So(c.DeleteKey("Demo", key), ShouldBeTrue)
+			}
+			So(c.GetKeyList("Demo"), ShouldResemble, []string{})
+			So(len(c.GetKeyList("Demo")), ShouldEqual, 0)
+		})
+
+		Convey("Delete all the sections", func() {
+			for _, sec := range c.GetSectionList() {
+				So(c.DeleteSection(sec), ShouldBeTrue)
+			}
+			So(c.GetSectionList(), ShouldResemble, []string{})
+			So(len(c.GetSectionList()), ShouldEqual, 0)
 		})
 	})
 
