@@ -26,6 +26,10 @@ func TestLoadConfigFile(t *testing.T) {
 		So(err, ShouldBeNil)
 		So(c, ShouldNotBeNil)
 
+		Convey("Test GetSectionList", func() {
+			So(c.GetSectionList(), ShouldResemble, []string{"DEFAULT", "Demo", "What's this?", "parent", "parent.child", "parent.child.child", "auto increment"})
+		})
+
 		Convey("Get value that does exist", func() {
 			v, err := c.GetValue("Demo", "key2")
 			So(err, ShouldBeNil)
