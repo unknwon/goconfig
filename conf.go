@@ -306,7 +306,7 @@ func (c *ConfigFile) GetSectionList() []string {
 // GetKeyList returns the list of all key in give section
 // in the same order in the file.
 func (c *ConfigFile) GetKeyList(section string) []string {
-	list := make([]string, 0, len(c.keyList[section]))
+	list := make([]string, len(c.keyList[section]))
 	copy(list, c.keyList[section])
 	return list
 }
