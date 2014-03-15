@@ -298,7 +298,7 @@ func (c *ConfigFile) MustInt64(section, key string, defaultVal ...int64) int64 {
 // GetSectionList returns the list of all sections
 // in the same order in the file.
 func (c *ConfigFile) GetSectionList() []string {
-	list := make([]string, 0, len(c.sectionList))
+	list := make([]string, len(c.sectionList))
 	copy(list, c.sectionList)
 	return list
 }
