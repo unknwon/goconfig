@@ -30,6 +30,10 @@ func TestLoadConfigFile(t *testing.T) {
 			So(c.GetSectionList(), ShouldResemble, []string{"DEFAULT", "Demo", "What's this?", "parent", "parent.child", "parent.child.child", "auto increment"})
 		})
 
+		Convey("Test GetKeyList", func() {
+			So(c.GetKeyList("Demo"), ShouldResemble, []string{" ", "key1", "key2", "key3"})
+		})
+
 		Convey("Get value that does exist", func() {
 			v, err := c.GetValue("Demo", "key2")
 			So(err, ShouldBeNil)
@@ -72,6 +76,10 @@ func TestLoadConfigFile(t *testing.T) {
 			v, err := c.GetValue("Demo", "key4")
 			So(err, ShouldBeNil)
 			So(v, ShouldEqual, "hello girl!")
+		})
+
+		Convey("Test GetKeyList", func() {
+			So(c.GetKeyList("Demo"), ShouldResemble, []string{" ", "key1", "key2", "key3", "key4"})
 		})
 
 		Convey("Delete a key", func() {
