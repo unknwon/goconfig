@@ -185,7 +185,10 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		noption = strings.TrimRight(noption, ")s")
 
 		// Search variable in default section
-		nvalue, _ := c.GetValue(DEFAULT_SECTION, noption)
+		nvalue, err := c.GetValue(DEFAULT_SECTION, noption)
+		if err != nil && section != DEFAULT_SECTION {
+			nvalue, _ = c.GetValue(section, noption)
+		}
 		// Search in the same section
 		if _, ok := c.data[section][noption]; ok {
 			nvalue = c.data[section][noption]
