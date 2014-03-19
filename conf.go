@@ -160,9 +160,9 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	}
 
 	// Section exists.
-	// Check if key exists.
+	// Check if key exists or empty value.
 	value, ok := c.data[section][key]
-	if !ok {
+	if !ok || len(value) == 0 {
 		// Check if it is a sub-section.
 		if i := strings.LastIndex(section, "."); i > -1 {
 			return c.GetValue(section[:i], key)
