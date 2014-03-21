@@ -19,12 +19,21 @@ import (
 	"os"
 )
 
+var (
+	PrettyFormat = true // Write spaces around "=" to look better.
+)
+
 // SaveConfigFile writes configuration file to local file system
 func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 	// Write configuration file by filename
 	var f *os.File
 	if f, err = os.Create(filename); err != nil {
 		return err
+	}
+
+	equalSign := "="
+	if PrettyFormat {
+		equalSign = " = "
 	}
 
 	// Data buffer
@@ -62,7 +71,7 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 				}
 
 				// Write key and value
-				if _, err = buf.WriteString(keyName + "=" + c.data[section][key] + LineBreak); err != nil {
+				if _, err = buf.WriteString(keyName + equalSign + c.data[section][key] + LineBreak); err != nil {
 					return err
 				}
 			}
