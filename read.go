@@ -1,4 +1,4 @@
-// Copyright 2013 Unknown
+// Copyright 2013-2014 Unknown
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -139,7 +139,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			)
 			//[SWH|+]:支持引号包围起来的字串
 			if line[0] == '"' {
-				if line[0:3] == `"""` {
+				if lineLengh >= 6 && line[0:3] == `"""` {
 					keyQuote = `"""`
 				} else {
 					keyQuote = `"`
@@ -169,9 +169,6 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			}
 			//[SWH|+];
 
-			//i := strings.IndexAny(line, "=:")
-			//if i > 0 {
-			//key := strings.TrimSpace(line[0:i])
 			// Check if it needs auto increment.
 			if key == "-" {
 				key = "#" + fmt.Sprint(count)
@@ -203,9 +200,8 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			} else {
 				value = strings.TrimSpace(line[vi:])
 			}
-			//fmt.Println(key, "=", value)
 			//[SWH|+];
-			//value := strings.TrimSpace(line[i+1:])
+
 			// Add section, key and value
 			c.SetValue(section, key, value)
 			// Set key comments and empty if it has comments
@@ -213,9 +209,6 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				c.SetKeyComments(section, key, comments)
 				comments = ""
 			}
-			//} else {
-			//	return readError{CouldNotParse, line} // Wrong format
-			//}
 		}
 
 		// Reached end of file
