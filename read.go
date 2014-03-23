@@ -159,7 +159,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 					return readError{CouldNotParse, line}
 				}
 				i = i + pos
-				key = strings.TrimSpace(line[qLen:pos])
+				key = line[qLen:pos] //保留引号内的两端的空格
 			} else {
 				i = strings.IndexAny(line, "=:")
 				if i <= 0 {
