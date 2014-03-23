@@ -42,7 +42,7 @@ const (
 var (
 	LineBreak = "\n"
 	// %(variable)s
-	varRegExp = regexp.MustCompile(`%\(([a-zA-Z0-9_.\-]+)\)s`)
+	varRegExp = regexp.MustCompile(`%\(([^\)]+)\)s`)
 )
 
 func init() {

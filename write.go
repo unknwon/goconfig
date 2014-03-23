@@ -17,6 +17,7 @@ package goconfig
 import (
 	"bytes"
 	"os"
+	"strings"
 )
 
 var (
@@ -69,9 +70,35 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 				if keyName[0] == '#' {
 					keyName = "-"
 				}
+				//[SWH|+]:支持键名包含等号和冒号
+				if strings.Contains(keyName, `=`) || strings.Contains(keyName, `:`) {
+					if strings.Contains(keyName, "`") {
+						if strings.Contains(keyName, `"`) {
+							keyName = `"""` + keyName + `"""`
+						} else {
+							keyName = `"` + keyName + `"`
+						}
+					} else {
+						keyName = "`" + keyName + "`"
+					}
+				}
+				value := c.data[section][key]
+				//[SWH|+]:支持值包含等号和冒号
+				if strings.Contains(value, `=`) || strings.Contains(value, `:`) {
+					if strings.Contains(value, "`") {
+						if strings.Contains(value, `"`) {
+							value = `"""` + value + `"""`
+						} else {
+							value = `"` + value + `"`
+						}
+					} else {
+						value = "`" + value + "`"
+					}
+				}
+				//[SWH|+];
 
 				// Write key and value
-				if _, err = buf.WriteString(keyName + equalSign + c.data[section][key] + LineBreak); err != nil {
+				if _, err = buf.WriteString(keyName + equalSign + value + LineBreak); err != nil {
 					return err
 				}
 			}
