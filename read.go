@@ -114,9 +114,9 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				comments += LineBreak + line
 			}
 			continue
-		case line[0] == '[' && line[len(line)-1] == ']': // New sction.
+		case line[0] == '[' && line[lineLengh-1] == ']': // New sction.
 			// Get section name.
-			section = strings.TrimSpace(line[1 : len(line)-1])
+			section = strings.TrimSpace(line[1 : lineLengh-1])
 			// Set section comments and empty if it has comments.
 			if len(comments) > 0 {
 				c.SetSectionComments(section, comments)
@@ -139,7 +139,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			)
 			//[SWH|+]:支持引号包围起来的字串
 			if line[0] == '"' {
-				if len(line) >= 3 && line[0:3] == `"""` {
+				if lineLengh >= 6 && line[0:3] == `"""` {
 					keyQuote = `"""`
 				} else {
 					keyQuote = `"`
