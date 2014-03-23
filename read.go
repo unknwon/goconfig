@@ -88,7 +88,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 	for {
 		line, err := buf.ReadString('\n')
 		line = strings.TrimSpace(line)
-
+		lineLengh := len(line) //[SWH|+]
 		if err != nil {
 			// Unexpected error
 			if err != io.EOF {
@@ -97,14 +97,14 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 
 			// Reached end of file, if nothing to read then break,
 			// otherwise handle the last line.
-			if len(line) == 0 {
+			if lineLengh == 0 {
 				break
 			}
 		}
 
 		// switch written for readability (not performance)
 		switch {
-		case len(line) == 0: // Empty line
+		case lineLengh == 0: // Empty line
 			continue
 		case line[0] == '#' || line[0] == ';': // Comment
 			// Append comments
@@ -130,25 +130,92 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		case section == "": // No section defined so far
 			return readError{BlankSection, line}
 		default: // Other alternatives
-			i := strings.IndexAny(line, "=:")
-			if i > 0 {
-				key := strings.TrimSpace(line[0:i])
-				// Check if it needs auto increment.
-				if key == "-" {
-					key = "#" + fmt.Sprint(count)
-					count++
+			var (
+				i        int
+				keyQuote string
+				key      string
+				valQuote string
+				value    string
+			)
+			//[SWH|+]:支持引号包围起来的字串
+			if line[0] == '"' {
+				if line[0:3] == `"""` {
+					keyQuote = `"""`
+				} else {
+					keyQuote = `"`
 				}
-				value := strings.TrimSpace(line[i+1:])
-				// Add section, key and value
-				c.SetValue(section, key, value)
-				// Set key comments and empty if it has comments
-				if len(comments) > 0 {
-					c.SetKeyComments(section, key, comments)
-					comments = ""
-				}
-			} else {
-				return readError{CouldNotParse, line} // Wrong format
+			} else if line[0] == '`' {
+				keyQuote = "`"
 			}
+			if keyQuote != "" {
+				qLen := len(keyQuote)
+				pos := strings.Index(line[qLen:], keyQuote)
+				if pos == -1 {
+					return readError{CouldNotParse, line}
+				}
+				pos = pos + qLen
+				i = strings.IndexAny(line[pos:], "=:")
+				if i <= 0 {
+					return readError{CouldNotParse, line}
+				}
+				i = i + pos
+				key = strings.TrimSpace(line[qLen:pos])
+			} else {
+				i = strings.IndexAny(line, "=:")
+				if i <= 0 {
+					return readError{CouldNotParse, line}
+				}
+				key = strings.TrimSpace(line[0:i])
+			}
+			//[SWH|+];
+
+			//i := strings.IndexAny(line, "=:")
+			//if i > 0 {
+			//key := strings.TrimSpace(line[0:i])
+			// Check if it needs auto increment.
+			if key == "-" {
+				key = "#" + fmt.Sprint(count)
+				count++
+			}
+			vi := i + 1
+			firstChar := ""
+			if lineLengh >= vi+2 {
+				firstChar = line[vi : vi+1]
+			}
+			//[SWH|+]:支持引号包围起来的字串
+			if firstChar == `"` {
+				if lineLengh >= vi+6 && line[vi:vi+3] == `"""` {
+					valQuote = `"""`
+				} else {
+					valQuote = `"`
+				}
+			} else if firstChar == "`" {
+				valQuote = "`"
+			}
+			if valQuote != "" {
+				qLen := vi + len(valQuote)
+				pos := strings.LastIndex(line[qLen:], valQuote)
+				if pos == -1 {
+					return readError{CouldNotParse, line}
+				}
+				pos = pos + qLen
+				value = strings.TrimSpace(line[qLen:pos])
+			} else {
+				value = strings.TrimSpace(line[vi:])
+			}
+			//fmt.Println(key, "=", value)
+			//[SWH|+];
+			//value := strings.TrimSpace(line[i+1:])
+			// Add section, key and value
+			c.SetValue(section, key, value)
+			// Set key comments and empty if it has comments
+			if len(comments) > 0 {
+				c.SetKeyComments(section, key, comments)
+				comments = ""
+			}
+			//} else {
+			//	return readError{CouldNotParse, line} // Wrong format
+			//}
 		}
 
 		// Reached end of file
