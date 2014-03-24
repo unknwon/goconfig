@@ -174,14 +174,16 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				key = "#" + fmt.Sprint(count)
 				count++
 			}
-			vi := i + 1
-			firstChar := ""
-			if lineLengh >= vi+2 {
-				firstChar = line[vi : vi+1]
-			}
+
 			//[SWH|+]:支持引号包围起来的字串
+			lineRight := strings.TrimSpace(line[i+1:])
+			lineRightLength := len(lineRight)
+			firstChar := ""
+			if lineRightLength >= 2 {
+				firstChar = lineRight[0:1]
+			}
 			if firstChar == `"` {
-				if lineLengh >= vi+6 && line[vi:vi+3] == `"""` {
+				if lineRightLength >= 6 && lineRight[0:3] == `"""` {
 					valQuote = `"""`
 				} else {
 					valQuote = `"`
@@ -190,15 +192,15 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				valQuote = "`"
 			}
 			if valQuote != "" {
-				qLen := vi + len(valQuote)
-				pos := strings.LastIndex(line[qLen:], valQuote)
+				qLen := len(valQuote)
+				pos := strings.LastIndex(lineRight[qLen:], valQuote)
 				if pos == -1 {
 					return readError{CouldNotParse, line}
 				}
 				pos = pos + qLen
-				value = strings.TrimSpace(line[qLen:pos])
+				value = lineRight[qLen:pos]
 			} else {
-				value = strings.TrimSpace(line[vi:])
+				value = strings.TrimSpace(lineRight[0:])
 			}
 			//[SWH|+];
 
