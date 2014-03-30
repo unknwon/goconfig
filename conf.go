@@ -87,6 +87,11 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 		defer c.lock.Unlock()
 	}
 
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
 		// Section not exists.
