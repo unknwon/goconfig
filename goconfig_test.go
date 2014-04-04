@@ -31,7 +31,7 @@ func TestLoadConfigFile(t *testing.T) {
 		})
 
 		Convey("Test GetKeyList", func() {
-			So(c.GetKeyList("Demo"), ShouldResemble, []string{"key1", "key2", "key3", "key:1", "key:2=key:1", "中国", "chinese-var"})
+			So(c.GetKeyList("Demo"), ShouldResemble, []string{"key1", "key2", "key3", "quote", "key:1", "key:2=key:1", "中国", "chinese-var"})
 		})
 
 		Convey("Get value that does exist", func() {
@@ -79,7 +79,7 @@ func TestLoadConfigFile(t *testing.T) {
 		})
 
 		Convey("Test GetKeyList", func() {
-			So(c.GetKeyList("Demo"), ShouldResemble, []string{"key1", "key2", "key3", "key:1", "key:2=key:1", "中国", "chinese-var", "key4"})
+			So(c.GetKeyList("Demo"), ShouldResemble, []string{"key1", "key2", "key3", "quote", "key:1", "key:2=key:1", "中国", "chinese-var", "key4"})
 		})
 
 		Convey("Delete a key", func() {

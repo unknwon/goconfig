@@ -182,14 +182,10 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			if lineRightLength >= 2 {
 				firstChar = lineRight[0:1]
 			}
-			if firstChar == `"` {
-				if lineRightLength >= 6 && lineRight[0:3] == `"""` {
-					valQuote = `"""`
-				} else {
-					valQuote = `"`
-				}
-			} else if firstChar == "`" {
+			if firstChar == "`" {
 				valQuote = "`"
+			} else if lineRightLength >= 6 && lineRight[0:3] == `"""` {
+				valQuote = `"""`
 			}
 			if valQuote != "" {
 				qLen := len(valQuote)
