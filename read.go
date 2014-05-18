@@ -74,10 +74,9 @@ func (c *ConfigFile) AppendFiles(files ...string) error {
 	return c.Reload()
 }
 
-// Read reads an io.Reader and returns a configuration representation. This
-// representation can be queried with GetValue.
+// Read reads an io.Reader and returns a configuration representation.
+// This representation can be queried with GetValue.
 func (c *ConfigFile) read(reader io.Reader) (err error) {
-	// Create buffer reader.
 	buf := bufio.NewReader(reader)
 
 	count := 1 // Counter for auto increment.
@@ -90,7 +89,6 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		line = strings.TrimSpace(line)
 		lineLengh := len(line) //[SWH|+]
 		if err != nil {
-			// Unexpected error
 			if err != io.EOF {
 				return err
 			}
@@ -200,16 +198,15 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			}
 			//[SWH|+];
 
-			// Add section, key and value
 			c.SetValue(section, key, value)
-			// Set key comments and empty if it has comments
+			// Set key comments and empty if it has comments.
 			if len(comments) > 0 {
 				c.SetKeyComments(section, key, comments)
 				comments = ""
 			}
 		}
 
-		// Reached end of file
+		// Reached end of file.
 		if err == io.EOF {
 			break
 		}
@@ -219,11 +216,11 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 
 // readError occurs when read configuration file with wrong format.
 type readError struct {
-	Reason  int    // Error reason
+	Reason  int
 	Content string // Line content
 }
 
-// Implement Error method.
+// Error implement Error interface.
 func (err readError) Error() string {
 	switch err.Reason {
 	case ErrBlankSectionName:
@@ -231,6 +228,5 @@ func (err readError) Error() string {
 	case ErrCouldNotParse:
 		return fmt.Sprintf("could not parse line: %s", string(err.Content))
 	}
-
 	return "invalid read error"
 }

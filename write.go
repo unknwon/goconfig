@@ -20,13 +20,12 @@ import (
 	"strings"
 )
 
-var (
-	PrettyFormat = true // Write spaces around "=" to look better.
-)
+// Write spaces around "=" to look better.
+var PrettyFormat = true
 
 // SaveConfigFile writes configuration file to local file system
 func SaveConfigFile(c *ConfigFile, filename string) (err error) {
-	// Write configuration file by filename
+	// Write configuration file by filename.
 	var f *os.File
 	if f, err = os.Create(filename); err != nil {
 		return err
@@ -37,11 +36,9 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 		equalSign = " = "
 	}
 
-	// Data buffer
 	buf := bytes.NewBuffer(nil)
-	// Write sections
 	for _, section := range c.sectionList {
-		// Write section comments
+		// Write section comments.
 		if len(c.GetSectionComments(section)) > 0 {
 			if _, err = buf.WriteString(c.GetSectionComments(section) + LineBreak); err != nil {
 				return err
@@ -49,16 +46,15 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 		}
 
 		if section != DEFAULT_SECTION {
-			// Write section name
+			// Write section name.
 			if _, err = buf.WriteString("[" + section + "]" + LineBreak); err != nil {
 				return err
 			}
 		}
 
-		// Write keys
 		for _, key := range c.keyList[section] {
 			if key != " " {
-				// Write key comments
+				// Write key comments.
 				if len(c.GetKeyComments(section, key)) > 0 {
 					if _, err = buf.WriteString(c.GetKeyComments(section, key) + LineBreak); err != nil {
 						return err
@@ -97,21 +93,21 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 				}
 				//[SWH|+];
 
-				// Write key and value
+				// Write key and value.
 				if _, err = buf.WriteString(keyName + equalSign + value + LineBreak); err != nil {
 					return err
 				}
 			}
 		}
 
-		// Put a line between sections
+		// Put a line between sections.
 		if _, err = buf.WriteString(LineBreak); err != nil {
 			return err
 		}
 	}
 
-	// Write to file
-	buf.WriteTo(f)
-	f.Close()
-	return nil
+	if _, err = buf.WriteTo(f); err != nil {
+		return err
+	}
+	return f.Close()
 }
