@@ -1,4 +1,4 @@
-// Copyright 2013-2014 Unknown
+// Copyright 2013 Unknown
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// goconfig is a easy-use comments-support configuration file parser.
+// Package goconfig is a easy-use comments-support configuration file parser.
 package goconfig
 
 import (
@@ -29,21 +29,20 @@ const (
 	DEFAULT_SECTION = "DEFAULT"
 	// Maximum allowed depth when recursively substituing variable names.
 	_DEPTH_VALUES = 200
-
-	// Get Errors.
-	SectionNotFound = iota
-	KeyNotFound
-	// Read Errors.
-	BlankSection
-	// Get and Read Errors.
-	CouldNotParse
 )
 
-var (
-	LineBreak = "\n"
-	// %(variable)s
-	varRegExp = regexp.MustCompile(`%\(([^\)]+)\)s`)
+// Parse error types.
+const (
+	ErrSectionNotFound = iota + 1
+	ErrKeyNotFound
+	ErrBlankSectionName
+	ErrCouldNotParse
 )
+
+var LineBreak = "\n"
+
+// Variable regexp pattern: %(variable)s
+var varPattern = regexp.MustCompile(`%\(([^\)]+)\)s`)
 
 func init() {
 	if runtime.GOOS == "windows" {
@@ -51,22 +50,22 @@ func init() {
 	}
 }
 
-// ConfigFile is the representation of configuration settings.
-// The public interface is entirely through methods.
+// A ConfigFile represents a INI formar configuration file.
 type ConfigFile struct {
-	lock            sync.RWMutex
-	fileNames       []string                     // Support mutil-files.
-	data            map[string]map[string]string // Section -> key : value
-	sectionList     []string                     // Section list
-	keyList         map[string][]string          // Section -> Key list
-	sectionComments map[string]string            // Sections comments
-	keyComments     map[string]map[string]string // Keys comments
-	BlockMode       bool
+	lock      sync.RWMutex                 // Go map is not safe.
+	fileNames []string                     // Support mutil-files.
+	data      map[string]map[string]string // Section -> key : value
+
+	// Lists can keep sections and keys in order.
+	sectionList []string            // Section name list.
+	keyList     map[string][]string // Section -> Key name list
+
+	sectionComments map[string]string            // Sections comments.
+	keyComments     map[string]map[string]string // Keys comments.
+	BlockMode       bool                         // Indicates whether use lock or not.
 }
 
 // newConfigFile creates an empty configuration representation.
-// This representation can be filled with AddSection and AddKey and then
-// saved to a file using SaveConfigFile.
 func newConfigFile(fileNames []string) *ConfigFile {
 	c := new(ConfigFile)
 	c.fileNames = fileNames
@@ -79,8 +78,9 @@ func newConfigFile(fileNames []string) *ConfigFile {
 }
 
 // SetValue adds a new section-key-value to the configuration.
-// It returns true if the key and value were inserted, and false if the value was overwritten.
-// If the section does not exist in advance, it is created.
+// It returns true if the key and value were inserted,
+// or returns false if the value was overwritten.
+// If the section does not exist in advance, it will be created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
 	if c.BlockMode {
 		c.lock.Lock()
@@ -94,7 +94,6 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
-		// Section not exists.
 		// Execute add operation.
 		c.data[section] = make(map[string]string)
 		// Append section to list.
@@ -112,21 +111,20 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 }
 
 // DeleteKey deletes the key in given section.
-// It returns true if the key was deleted, and false if the section or key didn't exist.
+// It returns true if the key was deleted,
+// or returns false if the section or key didn't exist.
 func (c *ConfigFile) DeleteKey(section, key string) bool {
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
-		// Section not exists.
 		return false
 	}
 
-	// Check if key exists
+	// Check if key exists.
 	if _, ok := c.data[section][key]; ok {
-		// Execute remove operation
 		delete(c.data[section], key)
-		// Remove comments of key
+		// Remove comments of key.
 		c.SetKeyComments(section, key, "")
-		// Get index of key
+		// Get index of key.
 		i := 0
 		for _, keyName := range c.keyList[section] {
 			if keyName == key {
@@ -134,9 +132,8 @@ func (c *ConfigFile) DeleteKey(section, key string) bool {
 			}
 			i++
 		}
-		// Remove from key list
-		c.keyList[section] =
-			append(c.keyList[section][:i], c.keyList[section][i+1:]...)
+		// Remove from key list.
+		c.keyList[section] = append(c.keyList[section][:i], c.keyList[section][i+1:]...)
 		return true
 	}
 	return false
@@ -161,7 +158,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return "", getError{SectionNotFound, section}
+		return "", getError{ErrSectionNotFound, section}
 	}
 
 	// Section exists.
@@ -174,32 +171,31 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		}
 
 		// Return empty value.
-		return "", getError{KeyNotFound, key}
+		return "", getError{ErrKeyNotFound, key}
 	}
 
 	// Key exists.
 	var i int
 	for i = 0; i < _DEPTH_VALUES; i++ {
-		vr := varRegExp.FindString(value)
+		vr := varPattern.FindString(value)
 		if len(vr) == 0 {
 			break
 		}
 
-		// Take off leading '%(' and trailing ')s'
+		// Take off leading '%(' and trailing ')s'.
 		noption := strings.TrimLeft(vr, "%(")
 		noption = strings.TrimRight(noption, ")s")
 
-		// Search variable in default section
+		// Search variable in default section.
 		nvalue, err := c.GetValue(DEFAULT_SECTION, noption)
 		if err != nil && section != DEFAULT_SECTION {
-			nvalue, _ = c.GetValue(section, noption)
-		}
-		// Search in the same section
-		if _, ok := c.data[section][noption]; ok {
-			nvalue = c.data[section][noption]
+			// Search in the same section.
+			if _, ok := c.data[section][noption]; ok {
+				nvalue = c.data[section][noption]
+			}
 		}
 
-		// substitute by new value and take off leading '%(' and trailing ')s'
+		// Substitute by new value and take off leading '%(' and trailing ')s'.
 		value = strings.Replace(value, vr, nvalue, -1)
 	}
 	return value, nil
@@ -207,49 +203,37 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 
 // Bool returns bool type value.
 func (c *ConfigFile) Bool(section, key string) (bool, error) {
-	// Get string format value.
 	value, err := c.GetValue(section, key)
 	if err != nil {
 		return false, err
 	}
-
-	// Convert type.
 	return strconv.ParseBool(value)
 }
 
 // Float64 returns float64 type value.
 func (c *ConfigFile) Float64(section, key string) (float64, error) {
-	// Get string format value.
 	value, err := c.GetValue(section, key)
 	if err != nil {
 		return 0.0, err
 	}
-
-	// Convert type.
 	return strconv.ParseFloat(value, 64)
 }
 
 // Int returns int type value.
 func (c *ConfigFile) Int(section, key string) (int, error) {
-	// Get string format value.
 	value, err := c.GetValue(section, key)
 	if err != nil {
 		return 0, err
 	}
-
-	// Convert type.
 	return strconv.Atoi(value)
 }
 
 // Int64 returns int64 type value.
 func (c *ConfigFile) Int64(section, key string) (int64, error) {
-	// Get string format value.
 	value, err := c.GetValue(section, key)
 	if err != nil {
 		return 0, err
 	}
-
-	// Convert type.
 	return strconv.ParseInt(value, 10, 64)
 }
 
@@ -324,15 +308,13 @@ func (c *ConfigFile) GetKeyList(section string) []string {
 func (c *ConfigFile) DeleteSection(section string) bool {
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
-		// Section not exists.
 		return false
 	}
 
-	// Execute remove operation
 	delete(c.data, section)
-	// Remove comments of section
+	// Remove comments of section.
 	c.SetSectionComments(section, "")
-	// Get index of section
+	// Get index of section.
 	i := 0
 	for _, secName := range c.sectionList {
 		if secName == section {
@@ -340,19 +322,18 @@ func (c *ConfigFile) DeleteSection(section string) bool {
 		}
 		i++
 	}
-	// Remove from section list
-	c.sectionList =
-		append(c.sectionList[:i], c.sectionList[i+1:]...)
+	// Remove from section list.
+	c.sectionList = append(c.sectionList[:i], c.sectionList[i+1:]...)
 	return true
 }
 
 // GetSection returns key-value pairs in given section.
 // It section does not exist, returns nil and error.
 func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
-	// Check if section exists
+	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return nil, getError{SectionNotFound, section}
+		return nil, getError{ErrSectionNotFound, section}
 	}
 
 	// Remove pre-defined key.
@@ -365,21 +346,19 @@ func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
 
 // SetSectionComments adds new section comments to the configuration.
 // If comments are empty(0 length), it will remove its section comments!
-// It returns true if the comments were inserted or removed, and false if the comments were overwritten.
+// It returns true if the comments were inserted or removed,
+// or returns false if the comments were overwritten.
 func (c *ConfigFile) SetSectionComments(section, comments string) bool {
-	// Check length of comments
 	if len(comments) == 0 {
-		// Check if section exists
 		if _, ok := c.sectionComments[section]; ok {
-			// Execute remove operation
 			delete(c.sectionComments, section)
 		}
 
-		// Not exists can be seen as remove
+		// Not exists can be seen as remove.
 		return true
 	}
 
-	// Check if comments exists
+	// Check if comments exists.
 	_, ok := c.sectionComments[section]
 	if comments[0] != '#' && comments[0] != ';' {
 		comments = "; " + comments
@@ -390,36 +369,31 @@ func (c *ConfigFile) SetSectionComments(section, comments string) bool {
 
 // SetKeyComments adds new section-key comments to the configuration.
 // If comments are empty(0 length), it will remove its section-key comments!
-// It returns true if the comments were inserted or removed, and false if the comments were overwritten.
+// It returns true if the comments were inserted or removed,
+// or returns false if the comments were overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetKeyComments(section, key, comments string) bool {
-	// Check if section exists
+	// Check if section exists.
 	if _, ok := c.keyComments[section]; ok {
-		// Section exists
-		// Check length of comments
 		if len(comments) == 0 {
-			// Check if key exists
 			if _, ok := c.keyComments[section][key]; ok {
-				// Execute remove operation
 				delete(c.keyComments[section], key)
 			}
 
-			// Not exists can be seen as remove
+			// Not exists can be seen as remove.
 			return true
 		}
 	} else {
-		// Section not exists
-		// Check length of comments
 		if len(comments) == 0 {
-			// Not exists can be seen as remove
+			// Not exists can be seen as remove.
 			return true
 		} else {
-			// Execute add operation
+			// Execute add operation.
 			c.keyComments[section] = make(map[string]string)
 		}
 	}
 
-	// Check if key exists
+	// Check if key exists.
 	_, ok := c.keyComments[section][key]
 	if comments[0] != '#' && comments[0] != ';' {
 		comments = "; " + comments
@@ -429,36 +403,33 @@ func (c *ConfigFile) SetKeyComments(section, key, comments string) bool {
 }
 
 // GetSectionComments returns the comments in the given section.
-// It returns an empty string(0 length) if the comments do not exist
+// It returns an empty string(0 length) if the comments do not exist.
 func (c *ConfigFile) GetSectionComments(section string) (comments string) {
 	return c.sectionComments[section]
 }
 
 // GetKeyComments returns the comments of key in the given section.
-// It returns an empty string(0 length) if the comments do not exist
+// It returns an empty string(0 length) if the comments do not exist.
 func (c *ConfigFile) GetKeyComments(section, key string) (comments string) {
-	// Check if section exists
 	if _, ok := c.keyComments[section]; ok {
-		// Exists
 		return c.keyComments[section][key]
 	}
-
-	// Not exists
 	return ""
 }
 
-// getError occurs when get value in configuration file with invalid parameter
+// getError occurs when get value in configuration file with invalid parameter.
 type getError struct {
-	Reason int // Error reason
+	Reason int
 	Name   string
 }
 
-// Implement Error method
+// Error implements Error interface.
 func (err getError) Error() string {
 	switch err.Reason {
-	case SectionNotFound:
-		return fmt.Sprintf("section '%s' not found", string(err.Name))
+	case ErrSectionNotFound:
+		return fmt.Sprintf("section '%s' not found", err.Name)
+	case ErrKeyNotFound:
+		return fmt.Sprintf("key '%s' not found", err.Name)
 	}
-
 	return "invalid get error"
 }

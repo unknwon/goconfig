@@ -1,4 +1,4 @@
-// Copyright 2013-2014 Unknown
+// Copyright 2013 Unknown
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -128,7 +128,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			count = 1
 			continue
 		case section == "": // No section defined so far
-			return readError{BlankSection, line}
+			return readError{ErrBlankSectionName, line}
 		default: // Other alternatives
 			var (
 				i        int
@@ -151,19 +151,19 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				qLen := len(keyQuote)
 				pos := strings.Index(line[qLen:], keyQuote)
 				if pos == -1 {
-					return readError{CouldNotParse, line}
+					return readError{ErrCouldNotParse, line}
 				}
 				pos = pos + qLen
 				i = strings.IndexAny(line[pos:], "=:")
 				if i <= 0 {
-					return readError{CouldNotParse, line}
+					return readError{ErrCouldNotParse, line}
 				}
 				i = i + pos
 				key = line[qLen:pos] //保留引号内的两端的空格
 			} else {
 				i = strings.IndexAny(line, "=:")
 				if i <= 0 {
-					return readError{CouldNotParse, line}
+					return readError{ErrCouldNotParse, line}
 				}
 				key = strings.TrimSpace(line[0:i])
 			}
@@ -191,7 +191,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				qLen := len(valQuote)
 				pos := strings.LastIndex(lineRight[qLen:], valQuote)
 				if pos == -1 {
-					return readError{CouldNotParse, line}
+					return readError{ErrCouldNotParse, line}
 				}
 				pos = pos + qLen
 				value = lineRight[qLen:pos]
@@ -226,9 +226,9 @@ type readError struct {
 // Implement Error method.
 func (err readError) Error() string {
 	switch err.Reason {
-	case BlankSection:
+	case ErrBlankSectionName:
 		return "empty section name not allowed"
-	case CouldNotParse:
+	case ErrCouldNotParse:
 		return fmt.Sprintf("could not parse line: %s", string(err.Content))
 	}
 

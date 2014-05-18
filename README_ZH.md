@@ -5,7 +5,7 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 
 ## 关于
 
-goconfig 是一个易于使用，支持注释的 Go 语言配置文件解析器，该文件的书写格式和 Windows 下的 INI 文件一样。
+包 goconfig 是一个易于使用，支持注释的 Go 语言配置文件解析器，该文件的书写格式和 Windows 下的 INI 文件一样。
 
 配置文件由形为 `[section]` 的节构成，内部使用 `name:value` 或 `name=value` 这样的键值对；每行开头和尾部的空白符号都将被忽略；如果未指定任何节，则会默认放入名为 `DEFAULT` 的节当中；可以使用 “;” 或 “#” 来作为注释的开头，并可以放置于任意的单独一行中。
 	
