@@ -3,6 +3,8 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 
 [中文文档](README_ZH.md)
 
+Code Convention: based on [Go Code Convention](https://github.com/Unknwon/go-code-convention).
+
 ## About
 
 Package goconfig is a easy-use, comments-support configuration file parser for the Go Programming Language, which provides a structure similar to what you would find on Microsoft Windows INI files.

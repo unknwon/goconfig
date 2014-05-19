@@ -140,10 +140,12 @@ func (c *ConfigFile) DeleteKey(section, key string) bool {
 }
 
 // GetValue returns the value of key available in the given section.
-// If the value needs to be unfolded (see e.g. %(google)s example in the GoConfig_test.go),
+// If the value needs to be unfolded
+// (see e.g. %(google)s example in the GoConfig_test.go),
 // then String does this unfolding automatically, up to
 // _DEPTH_VALUES number of iterations.
-// It returns an error if the section or (default)key does not exist and empty string value.
+// It returns an error and empty string value if the section does not exist,
+// or key does not exist in DEFAULT and current sections.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	if c.BlockMode {
 		c.lock.RLock()

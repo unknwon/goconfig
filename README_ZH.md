@@ -3,6 +3,8 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 
 本库已被 [《Go名库讲解》](https://github.com/Unknwon/go-rock-libraries-showcases/tree/master/lectures/01-goconfig) 收录讲解，欢迎前往学习如何使用！
 
+编码规范：基于 [Go 编码规范](https://github.com/Unknwon/go-code-convention)
+
 ## 关于
 
 包 goconfig 是一个易于使用，支持注释的 Go 语言配置文件解析器，该文件的书写格式和 Windows 下的 INI 文件一样。

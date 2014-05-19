@@ -22,58 +22,6 @@ import (
 	"strings"
 )
 
-func (c *ConfigFile) loadFile(fileName string) (err error) {
-	f, err := os.Open(fileName)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	return c.read(f)
-}
-
-// LoadConfigFile reads a file and returns a new configuration representation.
-// This representation can be queried with GetValue.
-func LoadConfigFile(fileName string, moreFiles ...string) (c *ConfigFile, err error) {
-	// Append files' name together.
-	fileNames := make([]string, 1, len(moreFiles)+1)
-	fileNames[0] = fileName
-	if len(moreFiles) > 0 {
-		fileNames = append(fileNames, moreFiles...)
-	}
-
-	c = newConfigFile(fileNames)
-
-	for _, name := range fileNames {
-		if err = c.loadFile(name); err != nil {
-			return nil, err
-		}
-	}
-
-	return c, nil
-}
-
-// Reload reloads configuration file in case it has changes.
-func (c *ConfigFile) Reload() (err error) {
-	var cfg *ConfigFile
-	if len(c.fileNames) == 1 {
-		cfg, err = LoadConfigFile(c.fileNames[0])
-	} else {
-		cfg, err = LoadConfigFile(c.fileNames[0], c.fileNames[1:]...)
-	}
-
-	if err == nil {
-		*c = *cfg
-	}
-	return err
-}
-
-// AppendFiles appends more files to ConfigFile and reload automatically.
-func (c *ConfigFile) AppendFiles(files ...string) error {
-	c.fileNames = append(c.fileNames, files...)
-	return c.Reload()
-}
-
 // Read reads an io.Reader and returns a configuration representation.
 // This representation can be queried with GetValue.
 func (c *ConfigFile) read(reader io.Reader) (err error) {
@@ -212,6 +160,58 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		}
 	}
 	return nil
+}
+
+func (c *ConfigFile) loadFile(fileName string) (err error) {
+	f, err := os.Open(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return c.read(f)
+}
+
+// LoadConfigFile reads a file and returns a new configuration representation.
+// This representation can be queried with GetValue.
+func LoadConfigFile(fileName string, moreFiles ...string) (c *ConfigFile, err error) {
+	// Append files' name together.
+	fileNames := make([]string, 1, len(moreFiles)+1)
+	fileNames[0] = fileName
+	if len(moreFiles) > 0 {
+		fileNames = append(fileNames, moreFiles...)
+	}
+
+	c = newConfigFile(fileNames)
+
+	for _, name := range fileNames {
+		if err = c.loadFile(name); err != nil {
+			return nil, err
+		}
+	}
+
+	return c, nil
+}
+
+// Reload reloads configuration file in case it has changes.
+func (c *ConfigFile) Reload() (err error) {
+	var cfg *ConfigFile
+	if len(c.fileNames) == 1 {
+		cfg, err = LoadConfigFile(c.fileNames[0])
+	} else {
+		cfg, err = LoadConfigFile(c.fileNames[0], c.fileNames[1:]...)
+	}
+
+	if err == nil {
+		*c = *cfg
+	}
+	return err
+}
+
+// AppendFiles appends more files to ConfigFile and reload automatically.
+func (c *ConfigFile) AppendFiles(files ...string) error {
+	c.fileNames = append(c.fileNames, files...)
+	return c.Reload()
 }
 
 // readError occurs when read configuration file with wrong format.
