@@ -247,6 +247,22 @@ func (c *ConfigFile) MustValue(section, key string, defaultVal ...string) string
 	return value
 }
 
+// MustValueRange always returns value without error,
+// it returns default value if error occurs or doesn't fit into range.
+func (c *ConfigFile) MustValueRange(section, key, defaultVal string, candidates []string) string {
+	val, err := c.GetValue(section, key)
+	if err != nil {
+		return defaultVal
+	}
+
+	for _, cand := range candidates {
+		if val == cand {
+			return val
+		}
+	}
+	return defaultVal
+}
+
 // MustBool always returns value without error,
 // it returns false if error occurs.
 func (c *ConfigFile) MustBool(section, key string, defaultVal ...bool) bool {

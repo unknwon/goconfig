@@ -269,3 +269,15 @@ func TestMust(t *testing.T) {
 		})
 	})
 }
+
+func TestRange(t *testing.T) {
+	Convey("Must return with range", t, func() {
+		c, err := LoadConfigFile("testdata/conf.ini")
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
+
+		So(c.MustValueRange("What's this?", "name", "joe", []string{"hello"}), ShouldEqual, "joe")
+		So(c.MustValueRange("What's this?", "name", "joe", []string{"hello", "try one more value ^-^"}),
+			ShouldEqual, "try one more value ^-^")
+	})
+}
