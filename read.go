@@ -16,10 +16,14 @@ package goconfig
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
+	"path"
 	"strings"
+	"time"
 )
 
 // Read reads an io.Reader and returns a configuration representation.
@@ -160,6 +164,21 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 		}
 	}
 	return nil
+}
+
+// LoadFromData accepts raw data directly from memory
+// and returns a new configuration representation.
+func LoadFromData(data []byte) (c *ConfigFile, err error) {
+	// Save memory data to temporary file to support further operations.
+	tmpName := path.Join(os.TempDir(), "goconfig", fmt.Sprintf("%d", time.Now().Nanosecond()))
+	os.MkdirAll(path.Dir(tmpName), os.ModePerm)
+	if err = ioutil.WriteFile(tmpName, data, 0655); err != nil {
+		return nil, err
+	}
+
+	c = newConfigFile([]string{tmpName})
+	err = c.read(bytes.NewBuffer(data))
+	return c, err
 }
 
 func (c *ConfigFile) loadFile(fileName string) (err error) {

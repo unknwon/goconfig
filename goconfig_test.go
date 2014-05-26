@@ -88,13 +88,13 @@ func TestLoadConfigFile(t *testing.T) {
 		Convey("Test GetKeyList", func() {
 			So(c.GetKeyList("Demo"), ShouldResemble,
 				[]string{"key1", "key2", "key3", "quote", "key:1",
-					"key:2=key:1", "中国", "chinese-var", "key4"})
+					"key:2=key:1", "中国", "chinese-var"})
 		})
 
 		Convey("Delete a key", func() {
 			So(c.DeleteKey("Demo", "key404"), ShouldBeFalse)
-			So(c.DeleteKey("Demo", "key4"), ShouldBeTrue)
-			_, err := c.GetValue("Demo", "key4")
+			So(c.DeleteKey("Demo", "中国"), ShouldBeTrue)
+			_, err := c.GetValue("Demo", "中国")
 			So(err, ShouldNotBeNil)
 			So(c.DeleteKey("404", "key"), ShouldBeFalse)
 		})

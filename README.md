@@ -91,3 +91,7 @@ Or
 - [goconf](http://code.google.com/p/goconf/)
 - [robfig/config](https://github.com/robfig/config)
 - [Delete an item from a slice](https://groups.google.com/forum/?fromgroups=#!topic/golang-nuts/lYz8ftASMQ0)
+
+## License
+
+This project is under Apache v2 License. See the [LICENSE](LICENSE) file for the full license text.

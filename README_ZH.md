@@ -91,3 +91,7 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 - [goconf](http://code.google.com/p/goconf/)
 - [robfig/config](https://github.com/robfig/config)
 - [Delete an item from a slice](https://groups.google.com/forum/?fromgroups=#!topic/golang-nuts/lYz8ftASMQ0)
+
+## 授权许可
+
+本项目采用 Apache v2 开源授权许可证，完整的授权说明已放置在 [LICENSE](LICENSE) 文件中。
