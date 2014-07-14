@@ -15,6 +15,7 @@
 package goconfig
 
 import (
+	"fmt"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -35,7 +36,7 @@ func TestLoadConfigFile(t *testing.T) {
 		Convey("Test GetKeyList", func() {
 			So(c.GetKeyList("Demo"), ShouldResemble,
 				[]string{"key1", "key2", "key3", "quote", "key:1",
-					"key:2=key:1", "中国", "chinese-var"})
+					"key:2=key:1", "中国", "chinese-var", "array_key"})
 		})
 
 		Convey("Get value that does exist", func() {
@@ -88,7 +89,7 @@ func TestLoadConfigFile(t *testing.T) {
 		Convey("Test GetKeyList", func() {
 			So(c.GetKeyList("Demo"), ShouldResemble,
 				[]string{"key1", "key2", "key3", "quote", "key:1",
-					"key:2=key:1", "中国", "chinese-var"})
+					"key:2=key:1", "中国", "chinese-var", "array_key"})
 		})
 
 		Convey("Delete a key", func() {
@@ -279,5 +280,15 @@ func TestRange(t *testing.T) {
 		So(c.MustValueRange("What's this?", "name", "joe", []string{"hello"}), ShouldEqual, "joe")
 		So(c.MustValueRange("What's this?", "name", "joe", []string{"hello", "try one more value ^-^"}),
 			ShouldEqual, "try one more value ^-^")
+	})
+}
+
+func TestArray(t *testing.T) {
+	Convey("Must return with string array", t, func() {
+		c, err := LoadConfigFile("testdata/conf.ini")
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
+
+		So(fmt.Sprintf("%s", c.MustValueArray("Demo", "array_key", ",")), ShouldEqual, "[1 2 3 4 5]")
 	})
 }

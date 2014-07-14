@@ -265,6 +265,17 @@ func (c *ConfigFile) MustValueRange(section, key, defaultVal string, candidates 
 	return defaultVal
 }
 
+// MustValueArray always returns value array without error,
+// it returns empty array if error occurs, split by delimiter otherwise.
+func (c *ConfigFile) MustValueArray(section, key, delim string) []string {
+	val, err := c.GetValue(section, key)
+	if err != nil {
+		return []string{}
+	}
+
+	return strings.Split(val, delim)
+}
+
 // MustBool always returns value without error,
 // it returns false if error occurs.
 func (c *ConfigFile) MustBool(section, key string, defaultVal ...bool) bool {
