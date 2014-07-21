@@ -273,7 +273,11 @@ func (c *ConfigFile) MustValueArray(section, key, delim string) []string {
 		return []string{}
 	}
 
-	return strings.Split(val, delim)
+	vals := strings.Split(val, delim)
+	for i := range vals {
+		vals[i] = strings.TrimSpace(vals[i])
+	}
+	return vals
 }
 
 // MustBool always returns value without error,
