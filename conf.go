@@ -119,6 +119,11 @@ func (c *ConfigFile) DeleteKey(section, key string) bool {
 		return false
 	}
 
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	// Check if key exists.
 	if _, ok := c.data[section][key]; ok {
 		delete(c.data[section], key)
