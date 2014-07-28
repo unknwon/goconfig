@@ -114,14 +114,14 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 // It returns true if the key was deleted,
 // or returns false if the section or key didn't exist.
 func (c *ConfigFile) DeleteKey(section, key string) bool {
-	// Check if section exists.
-	if _, ok := c.data[section]; !ok {
-		return false
-	}
-
 	// Blank section name represents DEFAULT section.
 	if len(section) == 0 {
 		section = DEFAULT_SECTION
+	}
+
+	// Check if section exists.
+	if _, ok := c.data[section]; !ok {
+		return false
 	}
 
 	// Check if key exists.
@@ -244,14 +244,26 @@ func (c *ConfigFile) Int64(section, key string) (int64, error) {
 	return strconv.ParseInt(value, 10, 64)
 }
 
-// MustValue always returns value without error,
-// it returns empty string if error occurs.
+// MustValue always returns value without error.
+// It returns empty string if error occurs, or the default value if given.
 func (c *ConfigFile) MustValue(section, key string, defaultVal ...string) string {
 	value, err := c.GetValue(section, key)
 	if err != nil && len(defaultVal) > 0 {
 		return defaultVal[0]
 	}
 	return value
+}
+
+// MustValue always returns value without error,
+// It returns empty string if error occurs, or the default value if given,
+// and a bool value indicates whether default value is returned.
+func (c *ConfigFile) MustValueSet(section, key string, defaultVal ...string) (string, bool) {
+	value, err := c.GetValue(section, key)
+	if err != nil && len(defaultVal) > 0 {
+		c.SetValue(section, key, defaultVal[0])
+		return defaultVal[0], true
+	}
+	return value, false
 }
 
 // MustValueRange always returns value without error,
@@ -336,14 +348,30 @@ func (c *ConfigFile) GetSectionList() []string {
 // GetKeyList returns the list of all key in give section
 // in the same order in the file.
 func (c *ConfigFile) GetKeyList(section string) []string {
-	list := make([]string, len(c.keyList[section])-1)
-	copy(list, c.keyList[section][1:])
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
+	// Non-default section has a blank key as section keeper.
+	offset := 1
+	if section == DEFAULT_SECTION {
+		offset = 0
+	}
+
+	list := make([]string, len(c.keyList[section])-offset)
+	copy(list, c.keyList[section][offset:])
 	return list
 }
 
 // DeleteSection deletes the entire section by given name.
 // It returns true if the section was deleted, and false if the section didn't exist.
 func (c *ConfigFile) DeleteSection(section string) bool {
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
 		return false
@@ -368,6 +396,11 @@ func (c *ConfigFile) DeleteSection(section string) bool {
 // GetSection returns key-value pairs in given section.
 // It section does not exist, returns nil and error.
 func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
@@ -387,6 +420,11 @@ func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
 // It returns true if the comments were inserted or removed,
 // or returns false if the comments were overwritten.
 func (c *ConfigFile) SetSectionComments(section, comments string) bool {
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	if len(comments) == 0 {
 		if _, ok := c.sectionComments[section]; ok {
 			delete(c.sectionComments, section)
@@ -411,6 +449,11 @@ func (c *ConfigFile) SetSectionComments(section, comments string) bool {
 // or returns false if the comments were overwritten.
 // If the section does not exist in advance, it is created.
 func (c *ConfigFile) SetKeyComments(section, key, comments string) bool {
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	// Check if section exists.
 	if _, ok := c.keyComments[section]; ok {
 		if len(comments) == 0 {
@@ -443,12 +486,21 @@ func (c *ConfigFile) SetKeyComments(section, key, comments string) bool {
 // GetSectionComments returns the comments in the given section.
 // It returns an empty string(0 length) if the comments do not exist.
 func (c *ConfigFile) GetSectionComments(section string) (comments string) {
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
 	return c.sectionComments[section]
 }
 
 // GetKeyComments returns the comments of key in the given section.
 // It returns an empty string(0 length) if the comments do not exist.
 func (c *ConfigFile) GetKeyComments(section, key string) (comments string) {
+	// Blank section name represents DEFAULT section.
+	if len(section) == 0 {
+		section = DEFAULT_SECTION
+	}
+
 	if _, ok := c.keyComments[section]; ok {
 		return c.keyComments[section][key]
 	}

@@ -37,6 +37,7 @@ func TestLoadConfigFile(t *testing.T) {
 			So(c.GetKeyList("Demo"), ShouldResemble,
 				[]string{"key1", "key2", "key3", "quote", "key:1",
 					"key:2=key:1", "中国", "chinese-var", "array_key"})
+			So(c.GetKeyList(""), ShouldResemble, []string{"google", "search"})
 		})
 
 		Convey("Get value that does exist", func() {
@@ -93,6 +94,7 @@ func TestLoadConfigFile(t *testing.T) {
 		})
 
 		Convey("Delete a key", func() {
+			So(c.DeleteKey("", "key404"), ShouldBeFalse)
 			So(c.DeleteKey("Demo", "key404"), ShouldBeFalse)
 			So(c.DeleteKey("Demo", "中国"), ShouldBeTrue)
 			_, err := c.GetValue("Demo", "中国")
@@ -109,11 +111,12 @@ func TestLoadConfigFile(t *testing.T) {
 		})
 
 		Convey("Delete section that does not exist", func() {
+			So(c.DeleteSection(""), ShouldBeTrue)
 			So(c.DeleteSection("404"), ShouldBeFalse)
 		})
 
 		Convey("Get section that exists", func() {
-			_, err = c.GetSection("Demo")
+			_, err = c.GetSection("")
 			So(err, ShouldBeNil)
 		})
 
@@ -123,7 +126,20 @@ func TestLoadConfigFile(t *testing.T) {
 		})
 
 		Convey("Set section comments", func() {
-			So(c.SetSectionComments("404", "demo comments"), ShouldBeTrue)
+			So(c.SetSectionComments("", "default section comments"), ShouldBeTrue)
+		})
+
+		Convey("Get section comments", func() {
+			So(c.GetSectionComments(""), ShouldEqual, "")
+		})
+
+		Convey("Set key comments", func() {
+			So(c.SetKeyComments("", "search", "search comments"), ShouldBeTrue)
+			So(c.SetKeyComments("404", "search", ""), ShouldBeTrue)
+		})
+
+		Convey("Get key comments", func() {
+			So(c.GetKeyComments("", "google"), ShouldEqual, "; Google")
 		})
 
 		Convey("Delete all the sections", func() {
@@ -245,6 +261,15 @@ func TestMust(t *testing.T) {
 			So(c.MustValue("parent.child", "died", "no"), ShouldEqual, "no")
 		})
 
+		Convey("Return string and bool", func() {
+			val, ok := c.MustValueSet("parent.child", "died")
+			So(val, ShouldEqual, "")
+			So(ok, ShouldBeFalse)
+			val, ok = c.MustValueSet("parent.child", "died", "no")
+			So(val, ShouldEqual, "no")
+			So(ok, ShouldBeTrue)
+		})
+
 		Convey("Return bool", func() {
 			So(c.MustBool("parent.child", "married"), ShouldBeTrue)
 			So(c.MustBool("parent.child", "died"), ShouldBeFalse)
@@ -278,6 +303,7 @@ func TestRange(t *testing.T) {
 		So(c, ShouldNotBeNil)
 
 		So(c.MustValueRange("What's this?", "name", "joe", []string{"hello"}), ShouldEqual, "joe")
+		So(c.MustValueRange("What's this?", "name404", "joe", []string{"hello"}), ShouldEqual, "joe")
 		So(c.MustValueRange("What's this?", "name", "joe", []string{"hello", "try one more value ^-^"}),
 			ShouldEqual, "try one more value ^-^")
 	})
@@ -290,5 +316,14 @@ func TestArray(t *testing.T) {
 		So(c, ShouldNotBeNil)
 
 		So(fmt.Sprintf("%s", c.MustValueArray("Demo", "array_key", ",")), ShouldEqual, "[1 2 3 4 5]")
+		So(fmt.Sprintf("%s", c.MustValueArray("Demo", "array_key404", ",")), ShouldEqual, "[]")
+	})
+}
+
+func TestLoadFromData(t *testing.T) {
+	Convey("Load config file from data", t, func() {
+		c, err := LoadFromData([]byte(""))
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
 	})
 }
