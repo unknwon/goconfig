@@ -80,7 +80,7 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 - `SetValue` 可以设置某个值。
 - `DeleteKey` 可以删除某个键。
 - 最后，`SaveConfigFile` 可以保持您的配置到本地文件系统。
-- 使用方法 `Reload` 可以重写您的配置文件。
+- 使用方法 `Reload` 可以重载您的配置文件。
 
 ## 更多信息
 
