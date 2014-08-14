@@ -1,4 +1,4 @@
-// Copyright 2013 Unknown
+// Copyright 2013 Unknwon
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -31,13 +31,6 @@ func TestLoadConfigFile(t *testing.T) {
 			So(c.GetSectionList(), ShouldResemble,
 				[]string{"DEFAULT", "Demo", "What's this?", "url", "parent",
 					"parent.child", "parent.child.child", "auto increment"})
-		})
-
-		Convey("Test GetKeyList", func() {
-			So(c.GetKeyList("Demo"), ShouldResemble,
-				[]string{"key1", "key2", "key3", "quote", "key:1",
-					"key:2=key:1", "中国", "chinese-var", "array_key"})
-			So(c.GetKeyList(""), ShouldResemble, []string{"google", "search"})
 		})
 
 		Convey("Get value that does exist", func() {
@@ -171,6 +164,25 @@ func TestLoadConfigFile(t *testing.T) {
 			v, err := c.GetValue("Demo", "key2")
 			So(err, ShouldBeNil)
 			So(v, ShouldEqual, "rewrite this key of conf.ini")
+		})
+	})
+}
+
+func TestGetKeyList(t *testing.T) {
+	Convey("Get key list", t, func() {
+		c, err := LoadConfigFile("testdata/conf.ini")
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
+
+		Convey("Get ket list that does exist", func() {
+			So(c.GetKeyList("Demo"), ShouldResemble,
+				[]string{"key1", "key2", "key3", "quote", "key:1",
+					"key:2=key:1", "中国", "chinese-var", "array_key"})
+			So(c.GetKeyList(""), ShouldResemble, []string{"google", "search"})
+		})
+
+		Convey("Get key list that not exist", func() {
+			So(c.GetKeyList("404"), ShouldBeNil)
 		})
 	})
 }

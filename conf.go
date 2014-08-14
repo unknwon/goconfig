@@ -345,12 +345,18 @@ func (c *ConfigFile) GetSectionList() []string {
 	return list
 }
 
-// GetKeyList returns the list of all key in give section
+// GetKeyList returns the list of all keys in give section
 // in the same order in the file.
+// It returns nil if given section does not exist.
 func (c *ConfigFile) GetKeyList(section string) []string {
 	// Blank section name represents DEFAULT section.
 	if len(section) == 0 {
 		section = DEFAULT_SECTION
+	}
+
+	// Check if section exists.
+	if _, ok := c.data[section]; !ok {
+		return nil
 	}
 
 	// Non-default section has a blank key as section keeper.
