@@ -247,30 +247,30 @@ func (c *ConfigFile) Int64(section, key string) (int64, error) {
 // MustValue always returns value without error.
 // It returns empty string if error occurs, or the default value if given.
 func (c *ConfigFile) MustValue(section, key string, defaultVal ...string) string {
-	value, err := c.GetValue(section, key)
-	if err != nil && len(defaultVal) > 0 {
+	val, err := c.GetValue(section, key)
+	if len(defaultVal) > 0 && (err != nil || len(val) == 0) {
 		return defaultVal[0]
 	}
-	return value
+	return val
 }
 
 // MustValue always returns value without error,
 // It returns empty string if error occurs, or the default value if given,
 // and a bool value indicates whether default value is returned.
 func (c *ConfigFile) MustValueSet(section, key string, defaultVal ...string) (string, bool) {
-	value, err := c.GetValue(section, key)
-	if err != nil && len(defaultVal) > 0 {
+	val, err := c.GetValue(section, key)
+	if len(defaultVal) > 0 && (err != nil || len(val) == 0) {
 		c.SetValue(section, key, defaultVal[0])
 		return defaultVal[0], true
 	}
-	return value, false
+	return val, false
 }
 
 // MustValueRange always returns value without error,
 // it returns default value if error occurs or doesn't fit into range.
 func (c *ConfigFile) MustValueRange(section, key, defaultVal string, candidates []string) string {
 	val, err := c.GetValue(section, key)
-	if err != nil {
+	if err != nil || len(val) == 0 {
 		return defaultVal
 	}
 
@@ -286,7 +286,7 @@ func (c *ConfigFile) MustValueRange(section, key, defaultVal string, candidates 
 // it returns empty array if error occurs, split by delimiter otherwise.
 func (c *ConfigFile) MustValueArray(section, key, delim string) []string {
 	val, err := c.GetValue(section, key)
-	if err != nil {
+	if err != nil || len(val) == 0 {
 		return []string{}
 	}
 
@@ -300,18 +300,18 @@ func (c *ConfigFile) MustValueArray(section, key, delim string) []string {
 // MustBool always returns value without error,
 // it returns false if error occurs.
 func (c *ConfigFile) MustBool(section, key string, defaultVal ...bool) bool {
-	value, err := c.Bool(section, key)
-	if err != nil && len(defaultVal) > 0 {
+	val, err := c.Bool(section, key)
+	if len(defaultVal) > 0 && err != nil {
 		return defaultVal[0]
 	}
-	return value
+	return val
 }
 
 // MustFloat64 always returns value without error,
 // it returns 0.0 if error occurs.
 func (c *ConfigFile) MustFloat64(section, key string, defaultVal ...float64) float64 {
 	value, err := c.Float64(section, key)
-	if err != nil && len(defaultVal) > 0 {
+	if len(defaultVal) > 0 && err != nil {
 		return defaultVal[0]
 	}
 	return value
@@ -321,7 +321,7 @@ func (c *ConfigFile) MustFloat64(section, key string, defaultVal ...float64) flo
 // it returns 0 if error occurs.
 func (c *ConfigFile) MustInt(section, key string, defaultVal ...int) int {
 	value, err := c.Int(section, key)
-	if err != nil && len(defaultVal) > 0 {
+	if len(defaultVal) > 0 && err != nil {
 		return defaultVal[0]
 	}
 	return value
@@ -331,7 +331,7 @@ func (c *ConfigFile) MustInt(section, key string, defaultVal ...int) int {
 // it returns 0 if error occurs.
 func (c *ConfigFile) MustInt64(section, key string, defaultVal ...int64) int64 {
 	value, err := c.Int64(section, key)
-	if err != nil && len(defaultVal) > 0 {
+	if len(defaultVal) > 0 && err != nil {
 		return defaultVal[0]
 	}
 	return value
