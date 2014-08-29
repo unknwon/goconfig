@@ -34,42 +34,9 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 
 [Go Walker](http://gowalker.org/github.com/Unknwon/goconfig).
 
-## 示例（支持注释！！！！）
+## 示例
 
-### conf.ini
-	
-	; Google
-	google=www.google.com
-	search=http://%(google)s
-
-	; Here are Comments
-	; Second line
-	[Demo]
-	# This symbol can also make this line to be comments
-	key1=Let's us goconfig!!!
-	key2=test data
-	key3=this is based on key2:%(key2)s
-
-	[What's this?]
-	; Not Enough Comments!!
-	name=try one more value ^-^
-
-	[parent]
-	name=john
-	relation=father
-	sex=male
-	age=32
-
-	[parent.child]
-	age=3
-
-	[parent.child.child]
-
-	; Auto increment by setting key to "-"
-	[auto increment]
-	-=hello
-	-=go
-	-=config
+请查看 [conf.ini](testdata/conf.ini) 文件作为使用示例。
 
 ### 用例
 

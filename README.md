@@ -26,49 +26,16 @@ The configuration file consists of sections, led by a `[section]` header and fol
 	go get github.com/Unknwon/goconfig
 
 Or
-
+	
 	gopm get github.com/Unknwon/goconfig
 
 ## API Documentation
 
 [Go Walker](http://gowalker.org/github.com/Unknwon/goconfig).
 
-## Example(Comments Support!!!!)
+## Example
 
-### conf.ini
-	
-	; Google
-	google=www.google.com
-	search=http://%(google)s
-
-	; Here are Comments
-	; Second line
-	[Demo]
-	# This symbol can also make this line to be comments
-	key1=Let's us goconfig!!!
-	key2=test data
-	key3=this is based on key2:%(key2)s
-
-	[What's this?]
-	; Not Enough Comments!!
-	name=try one more value ^-^
-
-	[parent]
-	name=john
-	relation=father
-	sex=male
-	age=32
-
-	[parent.child]
-	age=3
-
-	[parent.child.child]
-
-	; Auto increment by setting key to "-"
-	[auto increment]
-	-=hello
-	-=go
-	-=config
+Please see [conf.ini](testdata/conf.ini) as an example.
 
 ### Usage
 
