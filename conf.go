@@ -1,4 +1,4 @@
-// Copyright 2013 Unknown
+// Copyright 2013 Unknwon
 //
 // Licensed under the Apache License, Version 2.0 (the "License"): you may
 // not use this file except in compliance with the License. You may obtain
@@ -12,7 +12,7 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 
-// Package goconfig is a easy-use comments-support configuration file parser.
+// Package goconfig is a fully functional and comments-support configuration file(.ini) parser.
 package goconfig
 
 import (
@@ -171,7 +171,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	// Section exists.
 	// Check if key exists or empty value.
 	value, ok := c.data[section][key]
-	if !ok || len(value) == 0 {
+	if !ok {
 		// Check if it is a sub-section.
 		if i := strings.LastIndex(section, "."); i > -1 {
 			return c.GetValue(section[:i], key)

@@ -44,6 +44,11 @@ func TestLoadConfigFile(t *testing.T) {
 			So(err, ShouldNotBeNil)
 		})
 
+		Convey("Get value that has empty value", func() {
+			_, err := c.GetValue("What's this?", "empty_value")
+			So(err, ShouldBeNil)
+		})
+
 		Convey("Get value that section does not exist", func() {
 			_, err := c.GetValue("Demo404", "key4")
 			So(err, ShouldNotBeNil)
