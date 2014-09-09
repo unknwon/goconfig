@@ -79,19 +79,14 @@ func SaveConfigFile(c *ConfigFile, filename string) (err error) {
 					}
 				}
 				value := c.data[section][key]
-				//[SWH|+]:支持值包含等号和冒号
-				if strings.Contains(value, `=`) || strings.Contains(value, `:`) {
-					if strings.Contains(value, "`") {
-						if strings.Contains(value, `"`) {
-							value = `"""` + value + `"""`
-						} else {
-							value = `"` + value + `"`
-						}
+				// In case key value contains "`" or "\"".
+				if strings.Contains(value, "`") {
+					if strings.Contains(value, `"`) {
+						value = `"""` + value + `"""`
 					} else {
-						value = "`" + value + "`"
+						value = `"` + value + `"`
 					}
 				}
-				//[SWH|+];
 
 				// Write key and value.
 				if _, err = buf.WriteString(keyName + equalSign + value + LineBreak); err != nil {
