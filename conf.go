@@ -394,8 +394,9 @@ func (c *ConfigFile) DeleteSection(section string) bool {
 		}
 		i++
 	}
-	// Remove from section list.
+	// Remove from section and key list.
 	c.sectionList = append(c.sectionList[:i], c.sectionList[i+1:]...)
+	delete(c.keyList, section)
 	return true
 }
 
