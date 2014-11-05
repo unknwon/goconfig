@@ -31,6 +31,14 @@ import (
 func (c *ConfigFile) read(reader io.Reader) (err error) {
 	buf := bufio.NewReader(reader)
 
+	// Handle BOM-UTF8.
+	// http://en.wikipedia.org/wiki/Byte_order_mark#Representations_of_byte_order_marks_by_encoding
+	mask, err := buf.Peek(3)
+	if err == nil && len(mask) >= 3 &&
+		mask[0] == 239 && mask[1] == 187 && mask[2] == 191 {
+		buf.Read(mask)
+	}
+
 	count := 1 // Counter for auto increment.
 	// Current section name.
 	section := DEFAULT_SECTION
