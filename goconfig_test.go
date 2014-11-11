@@ -198,6 +198,8 @@ func TestSaveConfigFile(t *testing.T) {
 		So(err, ShouldBeNil)
 		So(c, ShouldNotBeNil)
 
+		c.SetValue("", "", "empty")
+
 		So(SaveConfigFile(c, "testdata/conf_test.ini"), ShouldBeNil)
 	})
 }

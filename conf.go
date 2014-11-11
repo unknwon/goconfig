@@ -82,14 +82,17 @@ func newConfigFile(fileNames []string) *ConfigFile {
 // or returns false if the value was overwritten.
 // If the section does not exist in advance, it will be created.
 func (c *ConfigFile) SetValue(section, key, value string) bool {
-	if c.BlockMode {
-		c.lock.Lock()
-		defer c.lock.Unlock()
-	}
-
 	// Blank section name represents DEFAULT section.
 	if len(section) == 0 {
 		section = DEFAULT_SECTION
+	}
+	if len(key) == 0 {
+		return false
+	}
+
+	if c.BlockMode {
+		c.lock.Lock()
+		defer c.lock.Unlock()
 	}
 
 	// Check if section exists.
