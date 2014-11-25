@@ -31,12 +31,13 @@ const (
 	_DEPTH_VALUES = 200
 )
 
-// Parse error types.
+type ParseError int
+
 const (
-	ErrSectionNotFound = iota + 1
-	ErrKeyNotFound
-	ErrBlankSectionName
-	ErrCouldNotParse
+	ERR_SECTION_NOT_FOUND ParseError = iota + 1
+	ERR_KEY_NOT_FOUND
+	ERR_BLANK_SECTION_NAME
+	ERR_COULD_NOT_PARSE
 )
 
 var LineBreak = "\n"
@@ -168,7 +169,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return "", getError{ErrSectionNotFound, section}
+		return "", getError{ERR_SECTION_NOT_FOUND, section}
 	}
 
 	// Section exists.
@@ -181,7 +182,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		}
 
 		// Return empty value.
-		return "", getError{ErrKeyNotFound, key}
+		return "", getError{ERR_KEY_NOT_FOUND, key}
 	}
 
 	// Key exists.
@@ -414,7 +415,7 @@ func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return nil, getError{ErrSectionNotFound, section}
+		return nil, getError{ERR_SECTION_NOT_FOUND, section}
 	}
 
 	// Remove pre-defined key.
@@ -519,16 +520,16 @@ func (c *ConfigFile) GetKeyComments(section, key string) (comments string) {
 
 // getError occurs when get value in configuration file with invalid parameter.
 type getError struct {
-	Reason int
+	Reason ParseError
 	Name   string
 }
 
 // Error implements Error interface.
 func (err getError) Error() string {
 	switch err.Reason {
-	case ErrSectionNotFound:
+	case ERR_SECTION_NOT_FOUND:
 		return fmt.Sprintf("section '%s' not found", err.Name)
-	case ErrKeyNotFound:
+	case ERR_KEY_NOT_FOUND:
 		return fmt.Sprintf("key '%s' not found", err.Name)
 	}
 	return "invalid get error"
