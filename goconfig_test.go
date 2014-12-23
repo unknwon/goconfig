@@ -346,3 +346,18 @@ func TestLoadFromData(t *testing.T) {
 		So(c, ShouldNotBeNil)
 	})
 }
+
+func Benchmark_GetValue(b *testing.B) {
+	c, _ := LoadConfigFile("testdata/conf.ini")
+	c.BlockMode = false
+	for i := 0; i < b.N; i++ {
+		c.GetValue("parent", "money")
+	}
+}
+
+func Benchmark_SetValue(b *testing.B) {
+	c, _ := LoadConfigFile("testdata/conf.ini")
+	for i := 0; i < b.N; i++ {
+		c.SetValue("parent", "money", "10")
+	}
+}
