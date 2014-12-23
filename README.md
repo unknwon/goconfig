@@ -3,7 +3,10 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 
 [中文文档](README_ZH.md)
 
-Code Convention: based on [Go Code Convention](https://github.com/Unknwon/go-code-convention).
+**IMPORTANT** 
+
+- This library is under bug fix only mode, which means no more features will be added.
+- I'm continuing working on better Go code with a different library: [ini](https://github.com/go-ini/ini).
 
 ## About
 
