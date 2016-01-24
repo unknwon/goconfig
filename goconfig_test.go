@@ -15,6 +15,7 @@
 package goconfig
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 
@@ -341,7 +342,7 @@ func TestArray(t *testing.T) {
 
 func TestLoadFromData(t *testing.T) {
 	Convey("Load config file from data", t, func() {
-		c, err := LoadFromData([]byte(""))
+		c, err := LoadFromData(bytes.NewBuffer([]byte("")))
 		So(err, ShouldBeNil)
 		So(c, ShouldNotBeNil)
 	})

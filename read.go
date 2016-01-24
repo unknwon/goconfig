@@ -16,14 +16,10 @@ package goconfig
 
 import (
 	"bufio"
-	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
-	"path"
 	"strings"
-	"time"
 )
 
 // Read reads an io.Reader and returns a configuration representation.
@@ -176,16 +172,9 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 
 // LoadFromData accepts raw data directly from memory
 // and returns a new configuration representation.
-func LoadFromData(data []byte) (c *ConfigFile, err error) {
-	// Save memory data to temporary file to support further operations.
-	tmpName := path.Join(os.TempDir(), "goconfig", fmt.Sprintf("%d", time.Now().Nanosecond()))
-	os.MkdirAll(path.Dir(tmpName), os.ModePerm)
-	if err = ioutil.WriteFile(tmpName, data, 0655); err != nil {
-		return nil, err
-	}
-
-	c = newConfigFile([]string{tmpName})
-	err = c.read(bytes.NewBuffer(data))
+func LoadFromData(in io.Reader) (c *ConfigFile, err error) {
+	c = newConfigFile([]string{""})
+	err = c.read(in)
 	return c, err
 }
 
@@ -224,11 +213,28 @@ func LoadConfigFile(fileName string, moreFiles ...string) (c *ConfigFile, err er
 func (c *ConfigFile) Reload() (err error) {
 	var cfg *ConfigFile
 	if len(c.fileNames) == 1 {
+		if c.fileNames[0] == "" {
+			return fmt.Errorf("file opened from in-memory data, use ReloadData to reload")
+		}
 		cfg, err = LoadConfigFile(c.fileNames[0])
 	} else {
 		cfg, err = LoadConfigFile(c.fileNames[0], c.fileNames[1:]...)
 	}
 
+	if err == nil {
+		*c = *cfg
+	}
+	return err
+}
+
+// ReloadData reloads configuration file from memory
+func (c *ConfigFile) ReloadData(in io.Reader) (err error) {
+	var cfg *ConfigFile
+	if len(c.fileNames) != 1 {
+		return fmt.Errorf("Multiple files loaded, unable to mix in-memory and file data")
+	}
+
+	cfg, err = LoadFromData(in)
 	if err == nil {
 		*c = *cfg
 	}
