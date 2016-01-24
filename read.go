@@ -243,6 +243,9 @@ func (c *ConfigFile) ReloadData(in io.Reader) (err error) {
 
 // AppendFiles appends more files to ConfigFile and reload automatically.
 func (c *ConfigFile) AppendFiles(files ...string) error {
+	if len(c.fileNames) == 1 && c.fileNames[0] == "" {
+		return fmt.Errorf("Cannot append file data to in-memory data")
+	}
 	c.fileNames = append(c.fileNames, files...)
 	return c.Reload()
 }
