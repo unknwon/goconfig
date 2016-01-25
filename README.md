@@ -13,7 +13,7 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 This fork was created by Klaus Post in Jan 2016 to support encrypted configuration. Main changes are:
 
 * `LoadFromData` no longer writes data to temporary file before loading.
-* `LoadFromData` takes an `io.Reader` for input instead of byte slice.
+* Added `LoadFromReader` that takes an `io.Reader` for input instead of byte slice.
 * `SaveConfigData` added, which writes configuration to an arbitrary writer.
 * `ReloadData` added to reload data from memory.
 

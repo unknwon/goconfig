@@ -16,6 +16,7 @@ package goconfig
 
 import (
 	"bufio"
+	"bytes"
 	"fmt"
 	"io"
 	"os"
@@ -170,11 +171,23 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 	return nil
 }
 
-// LoadFromData accepts raw data directly from memory
+// LoadFromReader accepts raw data directly from a reader
 // and returns a new configuration representation.
-func LoadFromData(in io.Reader) (c *ConfigFile, err error) {
+// You must use ReloadData to reload.
+// You cannot append files a configfile read this way.
+func LoadFromReader(in io.Reader) (c *ConfigFile, err error) {
 	c = newConfigFile([]string{""})
 	err = c.read(in)
+	return c, err
+}
+
+// LoadFromData accepts raw data directly from memory
+// and returns a new configuration representation.
+// You must use ReloadData to reload.
+// You cannot append files a configfile read this way.
+func LoadFromData(in []byte) (c *ConfigFile, err error) {
+	c = newConfigFile([]string{""})
+	err = c.read(bytes.NewBuffer(in))
 	return c, err
 }
 
@@ -234,7 +247,7 @@ func (c *ConfigFile) ReloadData(in io.Reader) (err error) {
 		return fmt.Errorf("Multiple files loaded, unable to mix in-memory and file data")
 	}
 
-	cfg, err = LoadFromData(in)
+	cfg, err = LoadFromReader(in)
 	if err == nil {
 		*c = *cfg
 	}
