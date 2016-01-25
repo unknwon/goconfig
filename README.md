@@ -8,6 +8,17 @@ goconfig [![Build Status](https://drone.io/github.com/Unknwon/goconfig/status.pn
 - This library is under bug fix only mode, which means no more features will be added.
 - I'm continuing working on better Go code with a different library: [ini](https://github.com/go-ini/ini).
 
+** FORK information **
+
+This fork was created by Klaus Post in Jan 2016 to support encrypted configuration. Main changes are:
+
+* `LoadFromData` no longer writes data to temporary file before loading.
+* Added `LoadFromReader` that takes an `io.Reader` for input instead of byte slice.
+* `SaveConfigData` added, which writes configuration to an arbitrary writer.
+* `ReloadData` added to reload data from memory.
+
+Note that you cannot mix in-memory configuration with on-disk configuration.
+
 ## About
 
 Package goconfig is a easy-use, comments-support configuration file parser for the Go Programming Language, which provides a structure similar to what you would find on Microsoft Windows INI files.
