@@ -15,7 +15,9 @@
 package goconfig
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -204,6 +206,19 @@ func TestSaveConfigFile(t *testing.T) {
 	})
 }
 
+func TestSaveConfigData(t *testing.T) {
+	Convey("Save a ConfigFile to file system", t, func() {
+		c, err := LoadConfigFile("testdata/conf.ini", "testdata/conf2.ini")
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
+
+		c.SetValue("", "", "empty")
+		var dst bytes.Buffer
+		So(SaveConfigData(c, &dst), ShouldBeNil)
+		So(dst.Len(), ShouldNotEqual, 0)
+	})
+}
+
 func TestReload(t *testing.T) {
 	Convey("Reload a configuration file", t, func() {
 		c, err := LoadConfigFile("testdata/conf.ini", "testdata/conf2.ini")
@@ -211,6 +226,18 @@ func TestReload(t *testing.T) {
 		So(c, ShouldNotBeNil)
 
 		So(c.Reload(), ShouldBeNil)
+	})
+}
+
+func TestReloadData(t *testing.T) {
+	Convey("Reload a configuration file", t, func() {
+		data, err := ioutil.ReadFile("testdata/conf.ini")
+		So(err, ShouldBeNil)
+		c, err := LoadFromReader(bytes.NewBuffer(data))
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
+
+		So(c.ReloadData(bytes.NewBuffer(data)), ShouldBeNil)
 	})
 }
 
@@ -342,6 +369,14 @@ func TestArray(t *testing.T) {
 func TestLoadFromData(t *testing.T) {
 	Convey("Load config file from data", t, func() {
 		c, err := LoadFromData([]byte(""))
+		So(err, ShouldBeNil)
+		So(c, ShouldNotBeNil)
+	})
+}
+
+func TestLoadFromReader(t *testing.T) {
+	Convey("Load config file from reader", t, func() {
+		c, err := LoadFromReader(bytes.NewBuffer([]byte("")))
 		So(err, ShouldBeNil)
 		So(c, ShouldNotBeNil)
 	})
