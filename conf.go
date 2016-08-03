@@ -114,6 +114,43 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 	return !ok
 }
 
+func (c *ConfigFile) SetValueT(section, key string, value interface{}) bool {
+	var str string
+	switch value := value.(type) {
+	case *bool:
+		str = strconv.FormatBool(*value)
+	case *float32:
+		str = strconv.FormatFloat(float64(*value), 'g', 6, 32)
+	case *float64:
+		str = strconv.FormatFloat(*value, 'g', 10, 64)
+	case *int:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int8:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int16:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int32:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int64:
+		str = strconv.FormatInt(*value, 10)
+	case *uint:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint8:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint16:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint32:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint64:
+		str = strconv.FormatUint(*value, 10)
+	case *string:
+		str = *value
+	default:
+		str = fmt.Sprint(value)
+	}
+	return c.SetValue(section, key, str)
+}
+
 // DeleteKey deletes the key in given section.
 // It returns true if the key was deleted,
 // or returns false if the section or key didn't exist.
