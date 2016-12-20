@@ -114,6 +114,43 @@ func (c *ConfigFile) SetValue(section, key, value string) bool {
 	return !ok
 }
 
+func (c *ConfigFile) SetValueT(section, key string, value interface{}) bool {
+	var str string
+	switch value := value.(type) {
+	case *bool:
+		str = strconv.FormatBool(*value)
+	case *float32:
+		str = strconv.FormatFloat(float64(*value), 'g', 6, 32)
+	case *float64:
+		str = strconv.FormatFloat(*value, 'g', 10, 64)
+	case *int:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int8:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int16:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int32:
+		str = strconv.FormatInt(int64(*value), 10)
+	case *int64:
+		str = strconv.FormatInt(*value, 10)
+	case *uint:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint8:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint16:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint32:
+		str = strconv.FormatUint(uint64(*value), 10)
+	case *uint64:
+		str = strconv.FormatUint(*value, 10)
+	case *string:
+		str = *value
+	default:
+		str = fmt.Sprint(value)
+	}
+	return c.SetValue(section, key, str)
+}
+
 // DeleteKey deletes the key in given section.
 // It returns true if the key was deleted,
 // or returns false if the section or key didn't exist.
@@ -226,6 +263,16 @@ func (c *ConfigFile) Bool(section, key string) (bool, error) {
 	return strconv.ParseBool(value)
 }
 
+// Float32 returns float32 type value.
+func (c *ConfigFile) Float32(section, key string) (float32, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0.0, err
+	}
+	f, err := strconv.ParseFloat(value, 32)
+	return float32(f), err
+}
+
 // Float64 returns float64 type value.
 func (c *ConfigFile) Float64(section, key string) (float64, error) {
 	value, err := c.GetValue(section, key)
@@ -233,6 +280,16 @@ func (c *ConfigFile) Float64(section, key string) (float64, error) {
 		return 0.0, err
 	}
 	return strconv.ParseFloat(value, 64)
+}
+
+// Byte returns byte type value.
+func (c *ConfigFile) Byte(section, key string) (byte, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseUint(value, 10, 8)
+	return byte(i), err
 }
 
 // Int returns int type value.
@@ -244,6 +301,36 @@ func (c *ConfigFile) Int(section, key string) (int, error) {
 	return strconv.Atoi(value)
 }
 
+// Int8 returns int8 type value.
+func (c *ConfigFile) Int8(section, key string) (int8, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseInt(value, 10, 8)
+	return int8(i), err
+}
+
+// Int16 returns int16 type value.
+func (c *ConfigFile) Int16(section, key string) (int16, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseInt(value, 10, 16)
+	return int16(i), err
+}
+
+// Int32 returns int32 type value.
+func (c *ConfigFile) Int32(section, key string) (int32, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseInt(value, 10, 32)
+	return int32(i), err
+}
+
 // Int64 returns int64 type value.
 func (c *ConfigFile) Int64(section, key string) (int64, error) {
 	value, err := c.GetValue(section, key)
@@ -251,6 +338,55 @@ func (c *ConfigFile) Int64(section, key string) (int64, error) {
 		return 0, err
 	}
 	return strconv.ParseInt(value, 10, 64)
+}
+
+// Uint returns uint type value.
+func (c *ConfigFile) Uint(section, key string) (uint, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseUint(value, 10, 0)
+	return uint(i), err
+}
+
+// Uint8 returns uint8 type value.
+func (c *ConfigFile) Uint8(section, key string) (uint8, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseUint(value, 10, 8)
+	return uint8(i), err
+}
+
+// Uint16 returns uint16 type value.
+func (c *ConfigFile) Uint16(section, key string) (uint16, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseUint(value, 10, 16)
+	return uint16(i), err
+}
+
+// Uint32 returns uint32 type value.
+func (c *ConfigFile) Uint32(section, key string) (uint32, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	i, err := strconv.ParseUint(value, 10, 32)
+	return uint32(i), err
+}
+
+// Uint64 returns uint64 type value.
+func (c *ConfigFile) Uint64(section, key string) (uint64, error) {
+	value, err := c.GetValue(section, key)
+	if err != nil {
+		return 0, err
+	}
+	return strconv.ParseUint(value, 10, 64)
 }
 
 // MustValue always returns value without error.
@@ -316,10 +452,30 @@ func (c *ConfigFile) MustBool(section, key string, defaultVal ...bool) bool {
 	return val
 }
 
+// MustFloat32 always returns value without error,
+// it returns 0.0 if error occurs.
+func (c *ConfigFile) MustFloat32(section, key string, defaultVal ...float32) float32 {
+	value, err := c.Float32(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
 // MustFloat64 always returns value without error,
 // it returns 0.0 if error occurs.
 func (c *ConfigFile) MustFloat64(section, key string, defaultVal ...float64) float64 {
 	value, err := c.Float64(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustByte always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustByte(section, key string, defaultVal ...byte) byte {
+	value, err := c.Byte(section, key)
 	if len(defaultVal) > 0 && err != nil {
 		return defaultVal[0]
 	}
@@ -336,10 +492,90 @@ func (c *ConfigFile) MustInt(section, key string, defaultVal ...int) int {
 	return value
 }
 
+// MustInt8 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustInt8(section, key string, defaultVal ...int8) int8 {
+	value, err := c.Int8(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustInt16 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustInt16(section, key string, defaultVal ...int16) int16 {
+	value, err := c.Int16(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustInt32 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustInt32(section, key string, defaultVal ...int32) int32 {
+	value, err := c.Int32(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
 // MustInt64 always returns value without error,
 // it returns 0 if error occurs.
 func (c *ConfigFile) MustInt64(section, key string, defaultVal ...int64) int64 {
 	value, err := c.Int64(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustUint always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustUint(section, key string, defaultVal ...uint) uint {
+	value, err := c.Uint(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustUint8 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustUint8(section, key string, defaultVal ...uint8) uint8 {
+	value, err := c.Uint8(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustUint16 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustUint16(section, key string, defaultVal ...uint16) uint16 {
+	value, err := c.Uint16(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustUint32 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustUint32(section, key string, defaultVal ...uint32) uint32 {
+	value, err := c.Uint32(section, key)
+	if len(defaultVal) > 0 && err != nil {
+		return defaultVal[0]
+	}
+	return value
+}
+
+// MustUint64 always returns value without error,
+// it returns 0 if error occurs.
+func (c *ConfigFile) MustUint64(section, key string, defaultVal ...uint64) uint64 {
+	value, err := c.Uint64(section, key)
 	if len(defaultVal) > 0 && err != nil {
 		return defaultVal[0]
 	}
