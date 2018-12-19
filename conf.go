@@ -158,7 +158,7 @@ func (c *ConfigFile) DeleteKey(section, key string) bool {
 // (see e.g. %(google)s example in the GoConfig_test.go),
 // then String does this unfolding automatically, up to
 // _DEPTH_VALUES number of iterations.
-// It returns an error and empty string value if the section does not exist,
+// It's considered as default section if the section does not exist,
 // or key does not exist in DEFAULT and current sections.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	if c.BlockMode {
@@ -173,8 +173,9 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
-		// Section does not exist.
-		return "", getError{ERR_SECTION_NOT_FOUND, section}
+		// If section doesn't exist, consider it as default section.
+		key = fmt.Sprintf("%s.%s", section, key)
+		section = DEFAULT_SECTION
 	}
 
 	// Section exists.
