@@ -21,13 +21,10 @@ import (
 	"strings"
 )
 
-// Write spaces around "=" to look better.
-var PrettyFormat = true
-
 // SaveConfigData writes configuration to a writer
 func SaveConfigData(c *ConfigFile, out io.Writer) (err error) {
 	equalSign := "="
-	if PrettyFormat {
+	if c.prettyFormat {
 		equalSign = " = "
 	}
 

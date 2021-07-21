@@ -64,6 +64,7 @@ type ConfigFile struct {
 	sectionComments map[string]string            // Sections comments.
 	keyComments     map[string]map[string]string // Keys comments.
 	BlockMode       bool                         // Indicates whether use lock or not.
+	prettyFormat    bool                         // Write spaces around "=" to look better.
 }
 
 // newConfigFile creates an empty configuration representation.
@@ -75,6 +76,7 @@ func newConfigFile(fileNames []string) *ConfigFile {
 	c.sectionComments = make(map[string]string)
 	c.keyComments = make(map[string]map[string]string)
 	c.BlockMode = true
+	c.prettyFormat = true
 	return c
 }
 
@@ -535,6 +537,11 @@ func (c *ConfigFile) GetKeyComments(section, key string) (comments string) {
 		return c.keyComments[section][key]
 	}
 	return ""
+}
+
+// SetPrettyFormat set the prettyFormat to decide whether write spaces around "=".
+func (c *ConfigFile) SetPrettyFormat(pretty bool) {
+	c.prettyFormat = pretty
 }
 
 // getError occurs when get value in configuration file with invalid parameter.
