@@ -86,7 +86,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 			count = 1
 			continue
 		case section == "": // No section defined so far
-			return readError{ERR_BLANK_SECTION_NAME, line}
+			return ReadError{ERR_BLANK_SECTION_NAME, line}
 		default: // Other alternatives
 			var (
 				i        int
@@ -109,19 +109,19 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				qLen := len(keyQuote)
 				pos := strings.Index(line[qLen:], keyQuote)
 				if pos == -1 {
-					return readError{ERR_COULD_NOT_PARSE, line}
+					return ReadError{ERR_COULD_NOT_PARSE, line}
 				}
 				pos = pos + qLen
 				i = strings.IndexAny(line[pos:], "=:")
 				if i <= 0 {
-					return readError{ERR_COULD_NOT_PARSE, line}
+					return ReadError{ERR_COULD_NOT_PARSE, line}
 				}
 				i = i + pos
 				key = line[qLen:pos] //保留引号内的两端的空格
 			} else {
 				i = strings.IndexAny(line, "=:")
 				if i <= 0 {
-					return readError{ERR_COULD_NOT_PARSE, line}
+					return ReadError{ERR_COULD_NOT_PARSE, line}
 				}
 				key = strings.TrimSpace(line[0:i])
 			}
@@ -149,7 +149,7 @@ func (c *ConfigFile) read(reader io.Reader) (err error) {
 				qLen := len(valQuote)
 				pos := strings.LastIndex(lineRight[qLen:], valQuote)
 				if pos == -1 {
-					return readError{ERR_COULD_NOT_PARSE, line}
+					return ReadError{ERR_COULD_NOT_PARSE, line}
 				}
 				pos = pos + qLen
 				value = lineRight[qLen:pos]
@@ -276,14 +276,14 @@ func (c *ConfigFile) AppendFiles(files ...string) error {
 	return c.Reload()
 }
 
-// readError occurs when read configuration file with wrong format.
-type readError struct {
+// ReadError occurs when read configuration file with wrong format.
+type ReadError struct {
 	Reason  ParseError
 	Content string // Line content
 }
 
 // Error implement Error interface.
-func (err readError) Error() string {
+func (err ReadError) Error() string {
 	switch err.Reason {
 	case ERR_BLANK_SECTION_NAME:
 		return "empty section name not allowed"
