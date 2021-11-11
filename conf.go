@@ -176,7 +176,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	// Check if section exists
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return "", getError{ERR_SECTION_NOT_FOUND, section}
+		return "", GetError{ERR_SECTION_NOT_FOUND, section}
 	}
 
 	// Section exists.
@@ -189,7 +189,7 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		}
 
 		// Return empty value.
-		return "", getError{ERR_KEY_NOT_FOUND, key}
+		return "", GetError{ERR_KEY_NOT_FOUND, key}
 	}
 
 	// Key exists.
@@ -436,7 +436,7 @@ func (c *ConfigFile) GetSection(section string) (map[string]string, error) {
 	// Check if section exists.
 	if _, ok := c.data[section]; !ok {
 		// Section does not exist.
-		return nil, getError{ERR_SECTION_NOT_FOUND, section}
+		return nil, GetError{ERR_SECTION_NOT_FOUND, section}
 	}
 
 	// Remove pre-defined key.
@@ -544,14 +544,14 @@ func (c *ConfigFile) SetPrettyFormat(pretty bool) {
 	c.prettyFormat = pretty
 }
 
-// getError occurs when get value in configuration file with invalid parameter.
-type getError struct {
+// GetError occurs when get value in configuration file with invalid parameter.
+type GetError struct {
 	Reason ParseError
 	Name   string
 }
 
 // Error implements Error interface.
-func (err getError) Error() string {
+func (err GetError) Error() string {
 	switch err.Reason {
 	case ERR_SECTION_NOT_FOUND:
 		return fmt.Sprintf("section '%s' not found", err.Name)
