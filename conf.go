@@ -163,9 +163,14 @@ func (c *ConfigFile) DeleteKey(section, key string) bool {
 // It returns an error and empty string value if the section does not exist,
 // or key does not exist in DEFAULT and current sections.
 func (c *ConfigFile) GetValue(section, key string) (string, error) {
+	unLocked := false
 	if c.BlockMode {
 		c.lock.RLock()
-		defer c.lock.RUnlock()
+		defer func() {
+			if !unLocked {
+				c.lock.RUnlock()
+			}
+		}()
 	}
 
 	// Blank section name represents DEFAULT section.
@@ -185,6 +190,10 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 	if !ok {
 		// Check if it is a sub-section.
 		if i := strings.LastIndex(section, "."); i > -1 {
+			if c.BlockMode {
+				unLocked = true
+				c.lock.RUnlock()
+			}
 			return c.GetValue(section[:i], key)
 		}
 
@@ -205,6 +214,10 @@ func (c *ConfigFile) GetValue(section, key string) (string, error) {
 		noption = strings.TrimRight(noption, ")s")
 
 		// Search variable in default section.
+		if c.BlockMode {
+			unLocked = true
+			c.lock.RUnlock()
+		}
 		nvalue, err := c.GetValue(DEFAULT_SECTION, noption)
 		if err != nil && section != DEFAULT_SECTION {
 			// Search in the same section.
